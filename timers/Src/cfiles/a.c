@@ -26,7 +26,7 @@ void initialise_board() {
     // Set all 8 LED's to output mode
 }
 
-// Initialize timer 2 with specified time period and callback function
+// Initialise timer 2 with specified time period and callback function
 void timer_init(uint32_t time_period_ms, callback_t cb) {
 	// Disable the interrupts while messing around with the settings
 	//  otherwise can lead to strange behaviour
@@ -43,7 +43,6 @@ void timer_init(uint32_t time_period_ms, callback_t cb) {
 
 	// TIM2 is a 32 bit timer
     // Set the timer prescaler
-    // Goal is to trigger an interrupt based on the provided time_period_ms
     // time_period_ms = (PSC + 1) * (ARR + 1) / 8_000_000 * 1000
 
     // For a 1ms timer tick: 8MHz / 8000 = 1kHz timer clock
@@ -52,10 +51,6 @@ void timer_init(uint32_t time_period_ms, callback_t cb) {
     // Calculate the auto-reload value based on the desired time period
     // For example, if time_period_ms = 2000 (2 seconds), ARR = 1999
     TIM2->ARR = (time_period_ms - 1);
-
-    // Disable Update Request Source (URS) bit
-    // This prevents update events from counter initialization
-    //TIM2->CR1 &= ~TIM_CR1_URS;
 
     // Generate an update event to load the new settings
     TIM2->EGR |= TIM_EGR_UG;
