@@ -1,0 +1,3 @@
+../Src/cfiles/b.c:15:5:get_x	1
+../Src/cfiles/b.c:20:6:set_x	1
+../Src/cfiles/b.c:26:6:set_new_period	1

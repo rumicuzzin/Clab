@@ -1,0 +1,7 @@
+"./Src/cfiles/a.o"
+"./Src/cfiles/b.o"
+"./Src/cfiles/c.o"
+"./Src/cfiles/syscalls.o"
+"./Src/cfiles/sysmem.o"
+"./Src/main.o"
+"./Startup/startup_stm32f303vctx.o"
