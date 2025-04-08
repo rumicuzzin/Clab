@@ -1,21 +1,24 @@
-MEETING MINUTES WEEK 6
+MEETING MINUTES WEEK 7
 
-DATE: Tuesday, 01/04/2025 
+DATE: Tuesday, 08/04/2025 
 
-TIME: 3pm - 5pm
+TIME: 2pm - 5pm
 
 ATTENDEES: 
-- 
+- Marcus Kurishingal
+- Willem Rumi
+- James Blissett
+- Aubrey Soo
 
 APOLOGIES: None
 
 ABSENCES: None
 
 OLD BUSINESS: 
-- 
+- Finish all exercises
 
 NEW BUSINESS:
-- 
+- begin integration tasks
 
 FURTHER ACTION POINTS:
 - 
