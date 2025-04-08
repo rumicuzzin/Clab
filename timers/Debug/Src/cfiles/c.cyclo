@@ -1,6 +1,0 @@
-/Users/willrumi/Desktop/2025_subs/tron_two/MTRX2700-2025/W10-touch-sensor/Drivers/CMSIS/Include/core_cm4.h:1688:22:__NVIC_EnableIRQ	2
-/Users/willrumi/Desktop/2025_subs/tron_two/MTRX2700-2025/W10-touch-sensor/Drivers/CMSIS/Include/core_cm4.h:1724:22:__NVIC_DisableIRQ	2
-/Users/willrumi/Desktop/2025_subs/tron_two/MTRX2700-2025/W10-touch-sensor/Drivers/CMSIS/Include/core_cm4.h:1777:22:__NVIC_ClearPendingIRQ	2
-/Users/willrumi/Desktop/2025_subs/tron_two/MTRX2700-2025/W10-touch-sensor/Drivers/CMSIS/Include/core_cm4.h:1816:22:__NVIC_SetPriority	2
-../Src/cfiles/c.c:8:6:one_shot_trigger	1
-../Src/cfiles/c.c:55:6:flash_led	1
