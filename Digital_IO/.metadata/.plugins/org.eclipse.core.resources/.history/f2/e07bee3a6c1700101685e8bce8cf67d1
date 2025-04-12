@@ -1,0 +1,67 @@
+#include <stdint.h>
+#include "stm32f303xc.h"
+#include "digital_io.h"
+
+#if !defined(__SOFT_FP__) && defined(__ARM_FP)
+  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#endif
+
+// First callback function - shifts the pattern left
+void chase_led(void) {
+    uint8_t current_pattern = DigitalIO_GetLEDPattern();
+
+    // Shift left by 1
+    current_pattern <<= 1;
+
+    // If all LEDs are off, turn on the first one
+    if (current_pattern == 0) {
+        current_pattern = 1;
+    }
+
+    // Update all LEDs at once
+    DigitalIO_SetLEDPattern(current_pattern);
+}
+
+// Second callback function - different pattern for testing
+void toggle_pattern(void) {
+    static uint8_t toggle = 0;
+
+    // Toggle between two different patterns
+    if (toggle) {
+        DigitalIO_SetLEDPattern(0x55); // 01010101
+    } else {
+        DigitalIO_SetLEDPattern(0xAA); // 10101010
+    }
+
+    toggle = !toggle;
+}
+
+int main(void)
+{
+    // Initialize with first callback
+    DigitalIO_Init(chase_led);
+
+    // Turn on first LED initially
+    DigitalIO_SetLED(0, 1);
+
+    uint32_t counter = 0;
+
+    /* Loop forever */
+    for(;;) {
+        // Count to ~5 seconds then change the callback
+        counter++;
+        if (counter == 5000000) {
+            // After ~5 seconds, change to the second callback
+            DigitalIO_SetButtonCallback(toggle_pattern);
+
+            // Flash all LEDs to indicate callback changed
+            DigitalIO_SetLEDPattern(0xFF);
+            for(volatile uint32_t i = 0; i < 500000; i++);
+            DigitalIO_SetLEDPattern(0x00);
+            for(volatile uint32_t i = 0; i < 500000; i++);
+            DigitalIO_SetLEDPattern(0xFF);
+            for(volatile uint32_t i = 0; i < 500000; i++);
+            DigitalIO_SetLEDPattern(0x00);
+        }
+    }
+}
