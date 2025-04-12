@@ -23,6 +23,8 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+//adding a comment
+
 #define ALTFUNCTION 0xA00
 #define RXTX 0x770000
 #define HIGHSPEED 0xF00
