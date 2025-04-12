@@ -19,6 +19,8 @@
 #include <stdint.h>
 #include "stm32f303xc.h"
 
+#include "serial.h"
+
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
@@ -30,20 +32,41 @@
 #define BUFFER 10
 #define LED_OUTPUT 0x5555
 
-void enableUSART1();
+//void enableUSART1();
 void enableLEDs();
+
+void finished_transmission(uint32_t bytes_sent) {
+	// This function will be called after a transmission is complete
+
+	volatile uint32_t test = 0;
+	// make a very simple delay
+	for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
+		// waste time !
+	}
+}
 
 int main(void)
 {
- enableUSART1();
+// Code from git, for receiving
+	uint8_t *string_to_send = "Sally is a beautiful dog!\r\n";
+
+	//void (*completion_function)(uint32_t) = &finished_transmission;
+
+	SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission);
+
+//	enableUSART1();
 	enableLEDs();
 
 	// Buffer to store incoming characters
 	unsigned char string[BUFFER];
 	int i = 0;
 
+/* Loop forever */
 	for(;;)
 	{
+
+		SerialOutputString(string_to_send, &USART1_PORT);
+
 		// Check for overrun or frame errors
 		if ((USART1->ISR & USART_ISR_FE_Msk) || (USART1->ISR & USART_ISR_ORE_Msk))
 		{
@@ -53,7 +76,12 @@ int main(void)
 		// If we have stored the maximum amount, stop
 		if (i == BUFFER)
 		{
-			continue;
+		    // Wipe the buffer by setting all its elements to 0, there is something wrong here, after 10 characters received it breaks
+			for (int n = 0; n < BUFFER; n++)
+			{
+				string[n] = 0;
+			}
+
 		}
 
 		// Data received
@@ -64,11 +92,19 @@ int main(void)
 
 			// Store the read data
 			string[i] = data;
+
+			if (string[i] == '#') {
+				continue;
+			}
 			i++;
+
+			// add if statement here for if the char is the terminating character
 
 			// Toggle LEDs
 			uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
 			*lights = !(*lights);
+//			*lights ^= 0xAA;
+
 		}
 	}
 }
