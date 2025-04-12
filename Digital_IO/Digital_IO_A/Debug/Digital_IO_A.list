@@ -1,0 +1,492 @@
+
+Digital_IO_A.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   00000194  08000000  08000000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         0000026c  08000194  08000194  00001194  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .rodata       00000000  08000400  08000408  00001408  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .ARM.extab    00000000  08000400  08000400  00001408  2**0
+                  CONTENTS, READONLY
+  4 .ARM          00000000  08000400  08000400  00001408  2**0
+                  CONTENTS, READONLY
+  5 .preinit_array 00000000  08000400  08000408  00001408  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .init_array   00000004  08000400  08000400  00001400  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .fini_array   00000004  08000404  08000404  00001404  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  8 .data         00000000  20000000  20000000  00001408  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  9 .ccmram       00000000  10000000  10000000  00001408  2**0
+                  CONTENTS
+ 10 .bss          0000001c  20000000  20000000  00002000  2**2
+                  ALLOC
+ 11 ._user_heap_stack 00000604  2000001c  2000001c  00002000  2**0
+                  ALLOC
+ 12 .ARM.attributes 00000030  00000000  00000000  00001408  2**0
+                  CONTENTS, READONLY
+ 13 .debug_info   00000426  00000000  00000000  00001438  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 14 .debug_abbrev 000001fe  00000000  00000000  0000185e  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 15 .debug_aranges 00000080  00000000  00000000  00001a60  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 16 .debug_rnglists 00000052  00000000  00000000  00001ae0  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 17 .debug_macro  00014d88  00000000  00000000  00001b32  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 18 .debug_line   00000c05  00000000  00000000  000168ba  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 19 .debug_str    00072375  00000000  00000000  000174bf  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 20 .comment      00000043  00000000  00000000  00089834  2**0
+                  CONTENTS, READONLY
+ 21 .debug_frame  00000104  00000000  00000000  00089878  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 22 .debug_line_str 0000004c  00000000  00000000  0008997c  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+08000194 <__do_global_dtors_aux>:
+ 8000194:	b510      	push	{r4, lr}
+ 8000196:	4c05      	ldr	r4, [pc, #20]	@ (80001ac <__do_global_dtors_aux+0x18>)
+ 8000198:	7823      	ldrb	r3, [r4, #0]
+ 800019a:	b933      	cbnz	r3, 80001aa <__do_global_dtors_aux+0x16>
+ 800019c:	4b04      	ldr	r3, [pc, #16]	@ (80001b0 <__do_global_dtors_aux+0x1c>)
+ 800019e:	b113      	cbz	r3, 80001a6 <__do_global_dtors_aux+0x12>
+ 80001a0:	4804      	ldr	r0, [pc, #16]	@ (80001b4 <__do_global_dtors_aux+0x20>)
+ 80001a2:	f3af 8000 	nop.w
+ 80001a6:	2301      	movs	r3, #1
+ 80001a8:	7023      	strb	r3, [r4, #0]
+ 80001aa:	bd10      	pop	{r4, pc}
+ 80001ac:	20000000 	.word	0x20000000
+ 80001b0:	00000000 	.word	0x00000000
+ 80001b4:	080003e8 	.word	0x080003e8
+
+080001b8 <frame_dummy>:
+ 80001b8:	b508      	push	{r3, lr}
+ 80001ba:	4b03      	ldr	r3, [pc, #12]	@ (80001c8 <frame_dummy+0x10>)
+ 80001bc:	b11b      	cbz	r3, 80001c6 <frame_dummy+0xe>
+ 80001be:	4903      	ldr	r1, [pc, #12]	@ (80001cc <frame_dummy+0x14>)
+ 80001c0:	4803      	ldr	r0, [pc, #12]	@ (80001d0 <frame_dummy+0x18>)
+ 80001c2:	f3af 8000 	nop.w
+ 80001c6:	bd08      	pop	{r3, pc}
+ 80001c8:	00000000 	.word	0x00000000
+ 80001cc:	20000004 	.word	0x20000004
+ 80001d0:	080003e8 	.word	0x080003e8
+
+080001d4 <DigitalIO_Init>:
+/**
+ * @brief Initialize the Digital I/O module
+ *
+ * Configures the LEDs (PE8-PE15) and the User button (PA0)
+ */
+void DigitalIO_Init(void) {
+ 80001d4:	b480      	push	{r7}
+ 80001d6:	b083      	sub	sp, #12
+ 80001d8:	af00      	add	r7, sp, #0
+    // Enable clocks for GPIOA (button) and GPIOE (LEDs)
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOEEN;
+ 80001da:	4b13      	ldr	r3, [pc, #76]	@ (8000228 <DigitalIO_Init+0x54>)
+ 80001dc:	695b      	ldr	r3, [r3, #20]
+ 80001de:	4a12      	ldr	r2, [pc, #72]	@ (8000228 <DigitalIO_Init+0x54>)
+ 80001e0:	f443 1308 	orr.w	r3, r3, #2228224	@ 0x220000
+ 80001e4:	6153      	str	r3, [r2, #20]
+
+    // Configure PE8-PE15 (LEDs) as outputs
+    uint16_t *led_output_registers = ((uint16_t *)&(GPIOE->MODER)) + 1;
+ 80001e6:	4b11      	ldr	r3, [pc, #68]	@ (800022c <DigitalIO_Init+0x58>)
+ 80001e8:	607b      	str	r3, [r7, #4]
+    *led_output_registers = 0x5555; // Set as outputs (01 pattern for each pin)
+ 80001ea:	687b      	ldr	r3, [r7, #4]
+ 80001ec:	f245 5255 	movw	r2, #21845	@ 0x5555
+ 80001f0:	801a      	strh	r2, [r3, #0]
+
+    // Configure PA0 (User button) as input (default state)
+    // No need to modify GPIOA->MODER since input is 00 (default)
+
+    // Configure with pull-down (button connects to VDD when pressed)
+    GPIOA->PUPDR &= ~(0x3);
+ 80001f2:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
+ 80001f6:	68db      	ldr	r3, [r3, #12]
+ 80001f8:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
+ 80001fc:	f023 0303 	bic.w	r3, r3, #3
+ 8000200:	60d3      	str	r3, [r2, #12]
+    GPIOA->PUPDR |= 0x2; // Pull-down (10 pattern)
+ 8000202:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
+ 8000206:	68db      	ldr	r3, [r3, #12]
+ 8000208:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
+ 800020c:	f043 0302 	orr.w	r3, r3, #2
+ 8000210:	60d3      	str	r3, [r2, #12]
+
+    // Turn off all LEDs initially
+    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+ 8000212:	4b07      	ldr	r3, [pc, #28]	@ (8000230 <DigitalIO_Init+0x5c>)
+ 8000214:	603b      	str	r3, [r7, #0]
+    *led_register = 0;
+ 8000216:	683b      	ldr	r3, [r7, #0]
+ 8000218:	2200      	movs	r2, #0
+ 800021a:	701a      	strb	r2, [r3, #0]
+}
+ 800021c:	bf00      	nop
+ 800021e:	370c      	adds	r7, #12
+ 8000220:	46bd      	mov	sp, r7
+ 8000222:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000226:	4770      	bx	lr
+ 8000228:	40021000 	.word	0x40021000
+ 800022c:	48001002 	.word	0x48001002
+ 8000230:	48001015 	.word	0x48001015
+
+08000234 <DigitalIO_SetLED>:
+ * @brief Set the state of a specific LED
+ *
+ * @param ledNumber LED number (0-7) corresponding to LD3-LD10
+ * @param state 0 to turn off, non-zero to turn on
+ */
+void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
+ 8000234:	b480      	push	{r7}
+ 8000236:	b085      	sub	sp, #20
+ 8000238:	af00      	add	r7, sp, #0
+ 800023a:	4603      	mov	r3, r0
+ 800023c:	460a      	mov	r2, r1
+ 800023e:	71fb      	strb	r3, [r7, #7]
+ 8000240:	4613      	mov	r3, r2
+ 8000242:	71bb      	strb	r3, [r7, #6]
+    // Validate LED number (0-7)
+    if (ledNumber > 7)
+ 8000244:	79fb      	ldrb	r3, [r7, #7]
+ 8000246:	2b07      	cmp	r3, #7
+ 8000248:	d822      	bhi.n	8000290 <DigitalIO_SetLED+0x5c>
+        return;
+
+    // Get pointer to LED register
+    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+ 800024a:	4b14      	ldr	r3, [pc, #80]	@ (800029c <DigitalIO_SetLED+0x68>)
+ 800024c:	60fb      	str	r3, [r7, #12]
+
+    if (state)
+ 800024e:	79bb      	ldrb	r3, [r7, #6]
+ 8000250:	2b00      	cmp	r3, #0
+ 8000252:	d00d      	beq.n	8000270 <DigitalIO_SetLED+0x3c>
+        *led_register |= (1 << ledNumber);  // Set bit
+ 8000254:	68fb      	ldr	r3, [r7, #12]
+ 8000256:	781b      	ldrb	r3, [r3, #0]
+ 8000258:	b25a      	sxtb	r2, r3
+ 800025a:	79fb      	ldrb	r3, [r7, #7]
+ 800025c:	2101      	movs	r1, #1
+ 800025e:	fa01 f303 	lsl.w	r3, r1, r3
+ 8000262:	b25b      	sxtb	r3, r3
+ 8000264:	4313      	orrs	r3, r2
+ 8000266:	b25b      	sxtb	r3, r3
+ 8000268:	b2da      	uxtb	r2, r3
+ 800026a:	68fb      	ldr	r3, [r7, #12]
+ 800026c:	701a      	strb	r2, [r3, #0]
+ 800026e:	e010      	b.n	8000292 <DigitalIO_SetLED+0x5e>
+    else
+        *led_register &= ~(1 << ledNumber); // Clear bit
+ 8000270:	68fb      	ldr	r3, [r7, #12]
+ 8000272:	781b      	ldrb	r3, [r3, #0]
+ 8000274:	b25a      	sxtb	r2, r3
+ 8000276:	79fb      	ldrb	r3, [r7, #7]
+ 8000278:	2101      	movs	r1, #1
+ 800027a:	fa01 f303 	lsl.w	r3, r1, r3
+ 800027e:	b25b      	sxtb	r3, r3
+ 8000280:	43db      	mvns	r3, r3
+ 8000282:	b25b      	sxtb	r3, r3
+ 8000284:	4013      	ands	r3, r2
+ 8000286:	b25b      	sxtb	r3, r3
+ 8000288:	b2da      	uxtb	r2, r3
+ 800028a:	68fb      	ldr	r3, [r7, #12]
+ 800028c:	701a      	strb	r2, [r3, #0]
+ 800028e:	e000      	b.n	8000292 <DigitalIO_SetLED+0x5e>
+        return;
+ 8000290:	bf00      	nop
+}
+ 8000292:	3714      	adds	r7, #20
+ 8000294:	46bd      	mov	sp, r7
+ 8000296:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800029a:	4770      	bx	lr
+ 800029c:	48001015 	.word	0x48001015
+
+080002a0 <DigitalIO_ReadButton>:
+/**
+ * @brief Read the current state of the user button
+ *
+ * @return 1 if button is pressed, 0 if not pressed
+ */
+uint8_t DigitalIO_ReadButton(void) {
+ 80002a0:	b480      	push	{r7}
+ 80002a2:	af00      	add	r7, sp, #0
+    // Read button state from PA0
+    return (GPIOA->IDR & GPIO_IDR_0) ? 1 : 0;
+ 80002a4:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
+ 80002a8:	691b      	ldr	r3, [r3, #16]
+ 80002aa:	f003 0301 	and.w	r3, r3, #1
+ 80002ae:	2b00      	cmp	r3, #0
+ 80002b0:	bf14      	ite	ne
+ 80002b2:	2301      	movne	r3, #1
+ 80002b4:	2300      	moveq	r3, #0
+ 80002b6:	b2db      	uxtb	r3, r3
+}
+ 80002b8:	4618      	mov	r0, r3
+ 80002ba:	46bd      	mov	sp, r7
+ 80002bc:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80002c0:	4770      	bx	lr
+	...
+
+080002c4 <main>:
+#if !defined(SOFT_FP) && defined(__ARM_FP)
+#warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#endif
+
+int main(void)
+{
+ 80002c4:	b580      	push	{r7, lr}
+ 80002c6:	b084      	sub	sp, #16
+ 80002c8:	af00      	add	r7, sp, #0
+    // Initialize digital I/O module
+    DigitalIO_Init();
+ 80002ca:	f7ff ff83 	bl	80001d4 <DigitalIO_Init>
+
+    // Turn on LD3 (first LED) initially
+    DigitalIO_SetLED(0, 1);
+ 80002ce:	2101      	movs	r1, #1
+ 80002d0:	2000      	movs	r0, #0
+ 80002d2:	f7ff ffaf 	bl	8000234 <DigitalIO_SetLED>
+
+    uint8_t current_led = 0;
+ 80002d6:	2300      	movs	r3, #0
+ 80002d8:	73fb      	strb	r3, [r7, #15]
+
+    /* Loop forever */
+    for(;;) {
+        // Check if button is pressed
+        if (DigitalIO_ReadButton()) {
+ 80002da:	f7ff ffe1 	bl	80002a0 <DigitalIO_ReadButton>
+ 80002de:	4603      	mov	r3, r0
+ 80002e0:	2b00      	cmp	r3, #0
+ 80002e2:	d0fa      	beq.n	80002da <main+0x16>
+            // When button is pressed, move to next LED
+
+            // Turn off current LED
+            DigitalIO_SetLED(current_led, 0);
+ 80002e4:	7bfb      	ldrb	r3, [r7, #15]
+ 80002e6:	2100      	movs	r1, #0
+ 80002e8:	4618      	mov	r0, r3
+ 80002ea:	f7ff ffa3 	bl	8000234 <DigitalIO_SetLED>
+
+            // Move to next LED (0-7 representing LD3-LD10)
+            current_led = (current_led + 1) % 8;
+ 80002ee:	7bfb      	ldrb	r3, [r7, #15]
+ 80002f0:	3301      	adds	r3, #1
+ 80002f2:	425a      	negs	r2, r3
+ 80002f4:	f003 0307 	and.w	r3, r3, #7
+ 80002f8:	f002 0207 	and.w	r2, r2, #7
+ 80002fc:	bf58      	it	pl
+ 80002fe:	4253      	negpl	r3, r2
+ 8000300:	73fb      	strb	r3, [r7, #15]
+
+            // Turn on new current LED
+            DigitalIO_SetLED(current_led, 1);
+ 8000302:	7bfb      	ldrb	r3, [r7, #15]
+ 8000304:	2101      	movs	r1, #1
+ 8000306:	4618      	mov	r0, r3
+ 8000308:	f7ff ff94 	bl	8000234 <DigitalIO_SetLED>
+
+            // Simple debounce delay
+            for(volatile uint32_t i = 0; i < 300000; i++);
+ 800030c:	2300      	movs	r3, #0
+ 800030e:	60bb      	str	r3, [r7, #8]
+ 8000310:	e002      	b.n	8000318 <main+0x54>
+ 8000312:	68bb      	ldr	r3, [r7, #8]
+ 8000314:	3301      	adds	r3, #1
+ 8000316:	60bb      	str	r3, [r7, #8]
+ 8000318:	68bb      	ldr	r3, [r7, #8]
+ 800031a:	4a0a      	ldr	r2, [pc, #40]	@ (8000344 <main+0x80>)
+ 800031c:	4293      	cmp	r3, r2
+ 800031e:	d9f8      	bls.n	8000312 <main+0x4e>
+
+            // Wait for button release
+            while(DigitalIO_ReadButton());
+ 8000320:	bf00      	nop
+ 8000322:	f7ff ffbd 	bl	80002a0 <DigitalIO_ReadButton>
+ 8000326:	4603      	mov	r3, r0
+ 8000328:	2b00      	cmp	r3, #0
+ 800032a:	d1fa      	bne.n	8000322 <main+0x5e>
+
+            // Additional debounce delay after release
+            for(volatile uint32_t i = 0; i < 100000; i++);
+ 800032c:	2300      	movs	r3, #0
+ 800032e:	607b      	str	r3, [r7, #4]
+ 8000330:	e002      	b.n	8000338 <main+0x74>
+ 8000332:	687b      	ldr	r3, [r7, #4]
+ 8000334:	3301      	adds	r3, #1
+ 8000336:	607b      	str	r3, [r7, #4]
+ 8000338:	687b      	ldr	r3, [r7, #4]
+ 800033a:	4a03      	ldr	r2, [pc, #12]	@ (8000348 <main+0x84>)
+ 800033c:	4293      	cmp	r3, r2
+ 800033e:	d9f8      	bls.n	8000332 <main+0x6e>
+        if (DigitalIO_ReadButton()) {
+ 8000340:	e7cb      	b.n	80002da <main+0x16>
+ 8000342:	bf00      	nop
+ 8000344:	000493df 	.word	0x000493df
+ 8000348:	0001869f 	.word	0x0001869f
+
+0800034c <Reset_Handler>:
+
+  .section .text.Reset_Handler
+  .weak Reset_Handler
+  .type Reset_Handler, %function
+Reset_Handler:
+  ldr   r0, =_estack
+ 800034c:	480d      	ldr	r0, [pc, #52]	@ (8000384 <LoopForever+0x2>)
+  mov   sp, r0          /* set stack pointer */
+ 800034e:	4685      	mov	sp, r0
+/* Call the clock system initialization function.*/
+  bl  SystemInit
+ 8000350:	f3af 8000 	nop.w
+
+/* Copy the data segment initializers from flash to SRAM */
+  ldr r0, =_sdata
+ 8000354:	480c      	ldr	r0, [pc, #48]	@ (8000388 <LoopForever+0x6>)
+  ldr r1, =_edata
+ 8000356:	490d      	ldr	r1, [pc, #52]	@ (800038c <LoopForever+0xa>)
+  ldr r2, =_sidata
+ 8000358:	4a0d      	ldr	r2, [pc, #52]	@ (8000390 <LoopForever+0xe>)
+  movs r3, #0
+ 800035a:	2300      	movs	r3, #0
+  b LoopCopyDataInit
+ 800035c:	e002      	b.n	8000364 <LoopCopyDataInit>
+
+0800035e <CopyDataInit>:
+
+CopyDataInit:
+  ldr r4, [r2, r3]
+ 800035e:	58d4      	ldr	r4, [r2, r3]
+  str r4, [r0, r3]
+ 8000360:	50c4      	str	r4, [r0, r3]
+  adds r3, r3, #4
+ 8000362:	3304      	adds	r3, #4
+
+08000364 <LoopCopyDataInit>:
+
+LoopCopyDataInit:
+  adds r4, r0, r3
+ 8000364:	18c4      	adds	r4, r0, r3
+  cmp r4, r1
+ 8000366:	428c      	cmp	r4, r1
+  bcc CopyDataInit
+ 8000368:	d3f9      	bcc.n	800035e <CopyDataInit>
+
+/* Zero fill the bss segment. */
+  ldr r2, =_sbss
+ 800036a:	4a0a      	ldr	r2, [pc, #40]	@ (8000394 <LoopForever+0x12>)
+  ldr r4, =_ebss
+ 800036c:	4c0a      	ldr	r4, [pc, #40]	@ (8000398 <LoopForever+0x16>)
+  movs r3, #0
+ 800036e:	2300      	movs	r3, #0
+  b LoopFillZerobss
+ 8000370:	e001      	b.n	8000376 <LoopFillZerobss>
+
+08000372 <FillZerobss>:
+
+FillZerobss:
+  str  r3, [r2]
+ 8000372:	6013      	str	r3, [r2, #0]
+  adds r2, r2, #4
+ 8000374:	3204      	adds	r2, #4
+
+08000376 <LoopFillZerobss>:
+
+LoopFillZerobss:
+  cmp r2, r4
+ 8000376:	42a2      	cmp	r2, r4
+  bcc FillZerobss
+ 8000378:	d3fb      	bcc.n	8000372 <FillZerobss>
+
+/* Call static constructors */
+  bl __libc_init_array
+ 800037a:	f000 f811 	bl	80003a0 <__libc_init_array>
+/* Call the application's entry point.*/
+  bl main
+ 800037e:	f7ff ffa1 	bl	80002c4 <main>
+
+08000382 <LoopForever>:
+
+LoopForever:
+  b LoopForever
+ 8000382:	e7fe      	b.n	8000382 <LoopForever>
+  ldr   r0, =_estack
+ 8000384:	2000a000 	.word	0x2000a000
+  ldr r0, =_sdata
+ 8000388:	20000000 	.word	0x20000000
+  ldr r1, =_edata
+ 800038c:	20000000 	.word	0x20000000
+  ldr r2, =_sidata
+ 8000390:	08000408 	.word	0x08000408
+  ldr r2, =_sbss
+ 8000394:	20000000 	.word	0x20000000
+  ldr r4, =_ebss
+ 8000398:	2000001c 	.word	0x2000001c
+
+0800039c <ADC1_2_IRQHandler>:
+ * @retval : None
+*/
+  .section .text.Default_Handler,"ax",%progbits
+Default_Handler:
+Infinite_Loop:
+  b Infinite_Loop
+ 800039c:	e7fe      	b.n	800039c <ADC1_2_IRQHandler>
+	...
+
+080003a0 <__libc_init_array>:
+ 80003a0:	b570      	push	{r4, r5, r6, lr}
+ 80003a2:	4d0d      	ldr	r5, [pc, #52]	@ (80003d8 <__libc_init_array+0x38>)
+ 80003a4:	4c0d      	ldr	r4, [pc, #52]	@ (80003dc <__libc_init_array+0x3c>)
+ 80003a6:	1b64      	subs	r4, r4, r5
+ 80003a8:	10a4      	asrs	r4, r4, #2
+ 80003aa:	2600      	movs	r6, #0
+ 80003ac:	42a6      	cmp	r6, r4
+ 80003ae:	d109      	bne.n	80003c4 <__libc_init_array+0x24>
+ 80003b0:	4d0b      	ldr	r5, [pc, #44]	@ (80003e0 <__libc_init_array+0x40>)
+ 80003b2:	4c0c      	ldr	r4, [pc, #48]	@ (80003e4 <__libc_init_array+0x44>)
+ 80003b4:	f000 f818 	bl	80003e8 <_init>
+ 80003b8:	1b64      	subs	r4, r4, r5
+ 80003ba:	10a4      	asrs	r4, r4, #2
+ 80003bc:	2600      	movs	r6, #0
+ 80003be:	42a6      	cmp	r6, r4
+ 80003c0:	d105      	bne.n	80003ce <__libc_init_array+0x2e>
+ 80003c2:	bd70      	pop	{r4, r5, r6, pc}
+ 80003c4:	f855 3b04 	ldr.w	r3, [r5], #4
+ 80003c8:	4798      	blx	r3
+ 80003ca:	3601      	adds	r6, #1
+ 80003cc:	e7ee      	b.n	80003ac <__libc_init_array+0xc>
+ 80003ce:	f855 3b04 	ldr.w	r3, [r5], #4
+ 80003d2:	4798      	blx	r3
+ 80003d4:	3601      	adds	r6, #1
+ 80003d6:	e7f2      	b.n	80003be <__libc_init_array+0x1e>
+ 80003d8:	08000400 	.word	0x08000400
+ 80003dc:	08000400 	.word	0x08000400
+ 80003e0:	08000400 	.word	0x08000400
+ 80003e4:	08000404 	.word	0x08000404
+
+080003e8 <_init>:
+ 80003e8:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 80003ea:	bf00      	nop
+ 80003ec:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80003ee:	bc08      	pop	{r3}
+ 80003f0:	469e      	mov	lr, r3
+ 80003f2:	4770      	bx	lr
+
+080003f4 <_fini>:
+ 80003f4:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 80003f6:	bf00      	nop
+ 80003f8:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80003fa:	bc08      	pop	{r3}
+ 80003fc:	469e      	mov	lr, r3
+ 80003fe:	4770      	bx	lr

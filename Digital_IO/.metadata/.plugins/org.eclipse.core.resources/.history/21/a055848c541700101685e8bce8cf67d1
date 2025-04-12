@@ -1,0 +1,49 @@
+/**
+ * @file digital_io.h
+ * @brief Digital I/O interface for STM32F3 Discovery board
+ */
+
+#ifndef DIGITAL_IO_H
+#define DIGITAL_IO_H
+
+#include <stdint.h>
+#include "stm32f303xc.h"
+
+/**
+ * @brief Initialize the Digital I/O module
+ *
+ * Configures the LEDs (PE8-PE15) and the User button (PA0)
+ */
+void DigitalIO_Init(void);
+
+/**
+ * @brief Set the state of a specific LED
+ *
+ * @param ledNumber LED number (0-7) corresponding to LD3-LD10
+ * @param state 0 to turn off, non-zero to turn on
+ */
+void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state);
+
+/**
+ * @brief Get the state of a specific LED
+ *
+ * @param ledNumber LED number (0-7) corresponding to LD3-LD10
+ * @return Current state of the LED (0 = off, 1 = on)
+ */
+uint8_t DigitalIO_GetLEDState(uint8_t ledNumber);
+
+/**
+ * @brief Set all LEDs according to a pattern
+ *
+ * @param pattern 8-bit pattern where each bit represents an LED
+ */
+void DigitalIO_SetLEDPattern(uint8_t pattern);
+
+/**
+ * @brief Get the current pattern of all LEDs
+ *
+ * @return 8-bit pattern representing the state of all LEDs
+ */
+uint8_t DigitalIO_GetLEDPattern(void);
+
+#endif /* DIGITAL_IO_H */

@@ -1,0 +1,5 @@
+"./Src/digital_io_b.o"
+"./Src/main_b.o"
+"./Src/syscalls.o"
+"./Src/sysmem.o"
+"./Startup/startup_stm32f303vctx.o"

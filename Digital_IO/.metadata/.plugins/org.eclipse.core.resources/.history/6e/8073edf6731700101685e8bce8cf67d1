@@ -1,0 +1,35 @@
+/**
+ * @file main_a_test.c
+ * @brief Test to identify LED mapping
+ */
+
+#include <stdint.h>
+#include "stm32f303xc.h"
+#include "digital_io_a.h"
+
+#if !defined(SOFT_FP) && defined(__ARM_FP)
+#warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#endif
+
+int main(void)
+{
+    // Initialize digital I/O module
+    DigitalIO_Init();
+
+    uint8_t current_led = 0;
+
+    /* Loop forever */
+    for(;;) {
+        // Turn off all LEDs
+        DigitalIO_SetLEDPattern(0);
+
+        // Turn on just one LED at a time
+        DigitalIO_SetLED(current_led, 1);
+
+        // Wait about 1 second
+        for(volatile uint32_t i = 0; i < 1000000; i++);
+
+        // Move to next LED
+        current_led = (current_led + 1) % 8;
+    }
+}
