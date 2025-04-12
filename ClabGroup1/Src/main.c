@@ -17,13 +17,88 @@
  */
 
 #include <stdint.h>
+#include "stm32f303xc.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+#define ALTFUNCTION 0xA00
+#define RXTX 0x770000
+#define HIGHSPEED 0xF00
+#define BAUDRATE 0x46
+#define BUFFER 10
+#define LED_OUTPUT 0x5555
+
+void enableUSART1();
+void enableLEDs();
+
 int main(void)
 {
-    /* Loop forever */
-	for(;;);
+ enableUSART1();
+	enableLEDs();
+
+	// Buffer to store incoming characters
+	unsigned char string[BUFFER];
+	int i = 0;
+
+	for(;;)
+	{
+		// Check for overrun or frame errors
+		if ((USART1->ISR & USART_ISR_FE_Msk) || (USART1->ISR & USART_ISR_ORE_Msk))
+		{
+			continue;
+		}
+
+		// If we have stored the maximum amount, stop
+		if (i == BUFFER)
+		{
+			continue;
+		}
+
+		// Data received
+		if (USART1->ISR & USART_ISR_RXNE_Msk)
+		{
+			// Read data
+			unsigned char data = (uint8_t) USART1->RDR;
+
+			// Store the read data
+			string[i] = data;
+			i++;
+
+			// Toggle LEDs
+			uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+			*lights = !(*lights);
+		}
+	}
+}
+
+void enableUSART1()
+{
+	// Enable GPIO C and USART1's clocks
+	RCC->AHBENR |= RCC_AHBENR_GPIOCEN_Msk;
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN_Msk;
+
+	// Set GPIO C to use UART as alternate function
+	GPIOC->MODER = ALTFUNCTION;
+	GPIOC->AFR[0] = RXTX;
+	GPIOC->OSPEEDR = HIGHSPEED;
+
+	// Set the baud rate and ready USART 1 for both receive and transmit
+	USART1->BRR = BAUDRATE;                   // Baud rate = 115200
+	USART1->CR1 |= USART_CR1_RE_Msk;
+	USART1->CR1 |= USART_CR1_TE_Msk;
+	USART1->CR1 |= USART_CR1_UE_Msk;
+}
+
+void enableLEDs()
+{
+	// Enable clock for Port E (LEDs)
+	RCC->AHBENR |= RCC_AHBENR_GPIOEEN;
+
+	// Get the most significant 16 bits of port mode register as that is where the mode for the LEDs are defined
+	uint16_t* portMode = ((uint16_t*)&(GPIOE->MODER))+1;
+
+	// Set the mode of the port pins to output since they are LEDs
+	*portMode = LED_OUTPUT;
 }
