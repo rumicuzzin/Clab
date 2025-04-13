@@ -16,74 +16,67 @@
  ******************************************************************************
  */
 
-#include <stdint.h>
-#include "stm32f303xc.h"
+ #include <stdint.h>
+ #include "stm32f303xc.h"
 
-#include "serial.h"
+ #include "serial.h"
 
-#if !defined(__SOFT_FP__) && defined(__ARM_FP)
-  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
-#endif
+ #if !defined(__SOFT_FP__) && defined(__ARM_FP)
+   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+ #endif
 
-#define ALTFUNCTION 0xA00
-#define RXTX 0x770000
-#define HIGHSPEED 0xF00
-#define BAUDRATE 0x46
-#define BUFFER 10
-#define LED_OUTPUT 0x5555
+ #define ALTFUNCTION 0xA00
+ #define RXTX 0x770000
+ #define HIGHSPEED 0xF00
+ #define BAUDRATE 0x46
+ #define LED_OUTPUT 0x5555
 
-//void enableUSART1();
-void enableLEDs();
+ void enableLEDs();
 
+ void finished_transmission(uint32_t bytes_sent) {
+     // This function will be called after a transmission is complete
 
+     volatile uint32_t test = 0;
+     // make a very simple delay
+     for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
+         // waste time !
+     }
+ }
 
-int main(void)
-{
-// Code from git, for receiving
-	uint8_t *string_to_send = "Sally is a beautiful dog!\r\n";
+ int main(void)
+ {
+ // Code from git, for receiving
+     uint8_t *string_to_send = "Sally is a beautiful dog!\r\n";
 
-	//void (*completion_function)(uint32_t) = &finished_transmission;
+     //void (*completion_function)(uint32_t) = &finished_transmission;
 
-	SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission);
-
-//	enableUSART1();
-	enableLEDs();
-
-	// Buffer to store incoming characters
-	unsigned char string[BUFFER];
-	int i = 0;
-
-/* Loop forever */
-	for(;;)
-	{
+     SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission);
+     USART1RX_enableInterrupts();
 
 
-	}
+ //	enableUSART1();
+     enableLEDs();
 
-}
+ /* Loop forever */
+     for(;;)
+     {
+    	 // Transmit string_to_send via USART1
+         SerialOutputString(string_to_send, &USART1_PORT);
+     }
+ }
 
-void finished_transmission(uint32_t bytes_sent) {
-	// This function will be called after a transmission is complete
 
-	volatile uint32_t test = 0;
-	// make a very simple delay
-	for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
-		// waste time !
-	}
-}
+ void enableLEDs()
+ {
+     // Enable clock for Port E (LEDs)
+     RCC->AHBENR |= RCC_AHBENR_GPIOEEN;
 
-void enableLEDs()
-{
-	// Enable clock for Port E (LEDs)
-	RCC->AHBENR |= RCC_AHBENR_GPIOEEN;
+     // Get the most significant 16 bits of port mode register as that is where the mode for the LEDs are defined
+     uint16_t* portMode = ((uint16_t*)&(GPIOE->MODER))+1;
 
-	// Get the most significant 16 bits of port mode register as that is where the mode for the LEDs are defined
-	uint16_t* portMode = ((uint16_t*)&(GPIOE->MODER))+1;
-
-	// Set the mode of the port pins to output since they are LEDs
-	*portMode = LED_OUTPUT;
-}
-
+     // Set the mode of the port pins to output since they are LEDs
+     *portMode = LED_OUTPUT;
+ }
 
 
 

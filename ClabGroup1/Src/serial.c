@@ -18,7 +18,10 @@ struct _SerialPort {
 	void (*completion_function)(uint32_t);
 };
 
-
+// Buffer to store incoming characters
+#define BUFFER 10
+unsigned char string[BUFFER];
+int i = 0;
 
 // instantiate the serial port parameters
 //   note: the complexity is hidden in the c file
@@ -94,6 +97,7 @@ void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*complet
 	serial_port->UART->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
 }
 
+
 void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
 
 	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
@@ -101,6 +105,8 @@ void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
 
 	serial_port->UART->TDR = data;
 }
+
+
 
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 
@@ -114,19 +120,18 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 	serial_port->completion_function(counter);
 }
 
-void USARTRX_enableInterrupts()
+void USART1RX_enableInterrupts()
 {
 	__disable_irq();
 
-	// Generate an interrupt upon receiving data
-	USART1->CR1 |= USART_CR1_RXNEIE_Msk;
-	// May need to add to this to enable transmit interrupts
+		// Generate an interrupt upon receiving data
+		USART1->CR1 |= USART_CR1_RXNEIE_Msk;
 
-	// Set priority and enable interrupts
-	NVIC_SetPriority(USART1_IRQn, 1);
-	NVIC_EnableIRQ(USART1_IRQn);
+		// Set priority and enable interrupts
+		NVIC_SetPriority(USART1_IRQn, 1);
+		NVIC_EnableIRQ(USART1_IRQn);
 
-	__enable_irq();
+		__enable_irq();
 }
 
 void USART1_EXTI25_IRQHandler()
@@ -157,4 +162,3 @@ void USART1_EXTI25_IRQHandler()
 		*lights = !(*lights);
 	}
 }
-
