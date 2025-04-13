@@ -19,9 +19,16 @@ struct _SerialPort {
 };
 
 // Buffer to store incoming characters
-#define BUFFER 10
+#define BUFFER 256
+
+// Defining the user terminated character variable
+signed char ter_char;
+// Initialising the buffer
 unsigned char string[BUFFER];
 int i = 0;
+
+// defining receive callback function
+//void(*receive_callback)(*str_pointer, char_count);
 
 // instantiate the serial port parameters
 //   note: the complexity is hidden in the c file
@@ -107,7 +114,6 @@ void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
 }
 
 
-
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 
 	uint32_t counter = 0;
@@ -120,7 +126,7 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 	serial_port->completion_function(counter);
 }
 
-void USART1RX_enableInterrupts()
+void USART1RX_enableInterrupts(char terminator)
 {
 	__disable_irq();
 
@@ -132,6 +138,9 @@ void USART1RX_enableInterrupts()
 		NVIC_EnableIRQ(USART1_IRQn);
 
 		__enable_irq();
+
+		//Defining the user defined terminating character on initialisation
+		ter_char = terminator;
 }
 
 void USART1_EXTI25_IRQHandler()
@@ -156,6 +165,11 @@ void USART1_EXTI25_IRQHandler()
 		// Store the read data
 		string[i] = data;
 		i++;
+
+		// Indicate that terminating character is received
+		if (data == ter_char){
+			SerialOutputString("Terminating Char Received", &USART1_PORT);
+		}
 
 		// Toggle LEDs
 		uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;

@@ -41,8 +41,8 @@ void SerialOutputChar(uint8_t, SerialPort *serial_port);
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port);
  
 // Enable interrupts
-// Need to have input and output for this function
-void USART1RX_enableInterrupts();
+// Need to have input and output for this function - passes in what the user defined terminating character should be
+void USART1RX_enableInterrupts(char terminator);
 
 // Defining what happens when interrupt called
 // Need to have input and output for this function

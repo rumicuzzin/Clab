@@ -45,19 +45,16 @@
 
  int main(void)
  {
- // Code from git, for receiving
+
      uint8_t *string_to_send = "Sally is a beautiful dog!\r\n";
 
      //void (*completion_function)(uint32_t) = &finished_transmission;
 
      SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission);
-     USART1RX_enableInterrupts();
-
-
- //	enableUSART1();
+     USART1RX_enableInterrupts('$');
      enableLEDs();
 
- /* Loop forever */
+     // Loop forever
      for(;;)
      {
     	 // Transmit string_to_send via USART1
