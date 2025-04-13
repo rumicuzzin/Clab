@@ -94,7 +94,6 @@ void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*complet
 	serial_port->UART->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
 }
 
-
 void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
 
 	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
@@ -102,8 +101,6 @@ void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
 
 	serial_port->UART->TDR = data;
 }
-
-
 
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 
@@ -117,5 +114,47 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 	serial_port->completion_function(counter);
 }
 
+void USARTRX_enableInterrupts()
+{
+	__disable_irq();
 
+	// Generate an interrupt upon receiving data
+	USART1->CR1 |= USART_CR1_RXNEIE_Msk;
+	// May need to add to this to enable transmit interrupts
+
+	// Set priority and enable interrupts
+	NVIC_SetPriority(USART1_IRQn, 1);
+	NVIC_EnableIRQ(USART1_IRQn);
+
+	__enable_irq();
+}
+
+void USART1_EXTI25_IRQHandler()
+{
+	// Check for overrun or frame errors
+	if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk))
+	{
+		return;
+	}
+
+	// If we have stored the maximum amount, stop
+	if (i == BUFFER)
+	{
+		return;
+	}
+
+	if (USART1->ISR & USART_ISR_RXNE_Msk)
+	{
+		// Read data
+		unsigned char data = (uint8_t) USART1->RDR;
+
+		// Store the read data
+		string[i] = data;
+		i++;
+
+		// Toggle LEDs
+		uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+		*lights = !(*lights);
+	}
+}
 

@@ -35,15 +35,7 @@
 //void enableUSART1();
 void enableLEDs();
 
-void finished_transmission(uint32_t bytes_sent) {
-	// This function will be called after a transmission is complete
 
-	volatile uint32_t test = 0;
-	// make a very simple delay
-	for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
-		// waste time !
-	}
-}
 
 int main(void)
 {
@@ -65,66 +57,19 @@ int main(void)
 	for(;;)
 	{
 
-		SerialOutputString(string_to_send, &USART1_PORT);
 
-		// Check for overrun or frame errors
-		if ((USART1->ISR & USART_ISR_FE_Msk) || (USART1->ISR & USART_ISR_ORE_Msk))
-		{
-			continue;
-		}
-
-		// If we have stored the maximum amount, stop
-		if (i == BUFFER)
-		{
-		    // Wipe the buffer by setting all its elements to 0, there is something wrong here, after 10 characters received it breaks
-			for (int n = 0; n < BUFFER; n++)
-			{
-				string[n] = 0;
-			}
-
-		}
-
-		// Data received
-		if (USART1->ISR & USART_ISR_RXNE_Msk)
-		{
-			// Read data
-			unsigned char data = (uint8_t) USART1->RDR;
-
-			// Store the read data
-			string[i] = data;
-
-			if (string[i] == '#') {
-				continue;
-			}
-			i++;
-
-			// add if statement here for if the char is the terminating character
-
-			// Toggle LEDs
-			uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
-			*lights = !(*lights);
-//			*lights ^= 0xAA;
-
-		}
 	}
+
 }
 
-void enableUSART1()
-{
-	// Enable GPIO C and USART1's clocks
-	RCC->AHBENR |= RCC_AHBENR_GPIOCEN_Msk;
-	RCC->APB2ENR |= RCC_APB2ENR_USART1EN_Msk;
+void finished_transmission(uint32_t bytes_sent) {
+	// This function will be called after a transmission is complete
 
-	// Set GPIO C to use UART as alternate function
-	GPIOC->MODER = ALTFUNCTION;
-	GPIOC->AFR[0] = RXTX;
-	GPIOC->OSPEEDR = HIGHSPEED;
-
-	// Set the baud rate and ready USART 1 for both receive and transmit
-	USART1->BRR = BAUDRATE;                   // Baud rate = 115200
-	USART1->CR1 |= USART_CR1_RE_Msk;
-	USART1->CR1 |= USART_CR1_TE_Msk;
-	USART1->CR1 |= USART_CR1_UE_Msk;
+	volatile uint32_t test = 0;
+	// make a very simple delay
+	for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
+		// waste time !
+	}
 }
 
 void enableLEDs()

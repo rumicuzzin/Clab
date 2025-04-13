@@ -40,5 +40,15 @@ void SerialOutputChar(uint8_t, SerialPort *serial_port);
 // Input: pointer to a NULL-TERMINATED string (if not null terminated, there will be problems)
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port);
  
+// Enable interrupts
+// Need to have input and output for this function
+void enableInterrupts()
+
+// Defining what happens when interrupt called
+// Need to have input and output for this function
+void USART1_EXTI25_IRQHandler();
+
+
  
+
 #endif
