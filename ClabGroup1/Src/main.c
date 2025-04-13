@@ -43,6 +43,16 @@
      }
  }
 
+ void a_placeholder(uint32_t bytes_sent) {
+     // This function will be called after a transmission is complete
+
+     volatile uint32_t test = 0;
+     // make a very simple delay
+     for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
+         // waste time !
+     }
+ }
+
  int main(void)
  {
 
@@ -50,7 +60,7 @@
 
      //void (*completion_function)(uint32_t) = &finished_transmission;
 
-     SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission);
+     SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission,&a_placeholder);
      USART1RX_enableInterrupts('$');
      enableLEDs();
 

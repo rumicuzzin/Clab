@@ -15,7 +15,12 @@ struct _SerialPort {
 	volatile uint32_t SerialPinSpeedValue;
 	volatile uint32_t SerialPinAlternatePinValueLow;
 	volatile uint32_t SerialPinAlternatePinValueHigh;
+
+	//TX completion callback function
 	void (*completion_function)(uint32_t);
+	//RX completion callback function
+	void (*rx_complete_callback)(unsigned char *incoming_buff, int incoming_counter)
+
 };
 
 // Buffer to store incoming characters
@@ -47,9 +52,10 @@ SerialPort USART1_PORT = {USART1,
 
 // InitialiseSerial - Initialise the serial port
 // Input: baudRate is from an enumerated set
-void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*completion_function)(uint32_t)) {
+void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*completion_function)(uint32_t), void (*rx_complete_callback)(unsigned char*, int)) {
 
 	serial_port->completion_function = completion_function;
+	serial_port->rx_complete_callback = rx_complete_callback;
 
 	// enable clock power, system configuration clock and GPIOC
 	// common to all UARTs
@@ -169,6 +175,7 @@ void USART1_EXTI25_IRQHandler()
 		// Indicate that terminating character is received
 		if (data == ter_char){
 			SerialOutputString("Terminating Char Received", &USART1_PORT);
+
 		}
 
 		// Toggle LEDs
