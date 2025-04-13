@@ -1,0 +1,5 @@
+../Src/digital_io_c.c:16:6:DigitalIO_InitStateTracking	1
+../Src/digital_io_c.c:31:6:DigitalIO_C_SetLED	3
+../Src/digital_io_c.c:51:6:DigitalIO_C_SetLEDPattern	1
+../Src/digital_io_c.c:63:9:DigitalIO_GetLEDState	2
+../Src/digital_io_c.c:75:9:DigitalIO_GetLEDPattern	1

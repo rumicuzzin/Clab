@@ -1,0 +1,5 @@
+../Src/digital_io_c.c:16:6:DigitalIO_InitStateTracking	16	static
+../Src/digital_io_c.c:31:6:DigitalIO_C_SetLED	24	static
+../Src/digital_io_c.c:51:6:DigitalIO_C_SetLEDPattern	24	static
+../Src/digital_io_c.c:63:9:DigitalIO_GetLEDState	16	static
+../Src/digital_io_c.c:75:9:DigitalIO_GetLEDPattern	4	static
