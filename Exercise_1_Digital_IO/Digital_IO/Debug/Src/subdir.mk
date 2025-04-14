@@ -5,7 +5,6 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Src/IRQHandler.c \
 ../Src/digital_io_a.c \
 ../Src/digital_io_b.c \
 ../Src/digital_io_c.c \
@@ -15,7 +14,6 @@ C_SRCS += \
 ../Src/sysmem.c 
 
 OBJS += \
-./Src/IRQHandler.o \
 ./Src/digital_io_a.o \
 ./Src/digital_io_b.o \
 ./Src/digital_io_c.o \
@@ -25,7 +23,6 @@ OBJS += \
 ./Src/sysmem.o 
 
 C_DEPS += \
-./Src/IRQHandler.d \
 ./Src/digital_io_a.d \
 ./Src/digital_io_b.d \
 ./Src/digital_io_c.d \
@@ -42,7 +39,7 @@ Src/%.o Src/%.su Src/%.cyclo: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/IRQHandler.cyclo ./Src/IRQHandler.d ./Src/IRQHandler.o ./Src/IRQHandler.su ./Src/digital_io_a.cyclo ./Src/digital_io_a.d ./Src/digital_io_a.o ./Src/digital_io_a.su ./Src/digital_io_b.cyclo ./Src/digital_io_b.d ./Src/digital_io_b.o ./Src/digital_io_b.su ./Src/digital_io_c.cyclo ./Src/digital_io_c.d ./Src/digital_io_c.o ./Src/digital_io_c.su ./Src/digital_io_d.cyclo ./Src/digital_io_d.d ./Src/digital_io_d.o ./Src/digital_io_d.su ./Src/main.cyclo ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.cyclo ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.cyclo ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su
+	-$(RM) ./Src/digital_io_a.cyclo ./Src/digital_io_a.d ./Src/digital_io_a.o ./Src/digital_io_a.su ./Src/digital_io_b.cyclo ./Src/digital_io_b.d ./Src/digital_io_b.o ./Src/digital_io_b.su ./Src/digital_io_c.cyclo ./Src/digital_io_c.d ./Src/digital_io_c.o ./Src/digital_io_c.su ./Src/digital_io_d.cyclo ./Src/digital_io_d.d ./Src/digital_io_d.o ./Src/digital_io_d.su ./Src/main.cyclo ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.cyclo ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.cyclo ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su
 
 .PHONY: clean-Src
 

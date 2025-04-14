@@ -1,32 +1,21 @@
-#include "digital_io_d.h"
-#include "stm32f303xc.h"
-#include <stddef.h>
 
-/* Global variables */
-static LedState_t led_move = LED_IDLE; // Current LED movement state
-static uint8_t current_led = 0; // Track which LED is currently lit
+#include "../inc/digital_io_a.h"
+#include "../inc/digital_io_b.h"
+#include "../inc/digital_io_d.h"
 
-void next_led(void) {
-    // Turn off current LED
-    DigitalIO_SetLED(current_led, 0);
 
-    // Move to next LED
-    current_led = (current_led + 1) % 8;
+static LedState_t led_move = LED_IDLE;
 
-    // Turn on new current LED
-    DigitalIO_SetLED(current_led, 1);
+void new_callback_function(void){
+// If there is no delay, act as normal
+	if (led_move == LED_IDLE) {
+		led_move = LED_MOVE_PENDING;
+
+	}
 }
 
 
-void delay_button_callback(void) {
-
-    // If there is no pending move, request one
-    if (led_move == LED_IDLE) {
-        led_move = LED_MOVE_PENDING;
-    }
-}
-
-
+// Timer IRQ handler
 void TIM2_IRQHandler(void) {
     // Clear interrupt flag
     TIM2->SR &= ~TIM_SR_UIF;
@@ -39,32 +28,29 @@ void TIM2_IRQHandler(void) {
     }
 }
 
-void DigitalIO_InitDelay(uint16_t delay_ms) {
+
+// Timer initialization
+void initialise_delay(void) {
     // Enable clock for TIM2
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
-    // Configure TIM2 for the specified delay
-    TIM2->PSC = 7999;                  // 8MHz / 8000 = 1kHz (1ms tick)
-    TIM2->ARR = delay_ms - 1;          // Set period to desired delay
-    TIM2->CNT = 0;                     // Reset counter
-    TIM2->DIER = TIM_DIER_UIE;         // Enable update interrupt
-    TIM2->CR1 = TIM_CR1_CEN;           // Enable counter
+    // Configure TIM2 for periodic checking (e.g., every 500ms)
+    TIM2->PSC = 7999;          // in terms of 1 ms
+    TIM2->ARR = 2999;          // Get a 3 second delay
+    TIM2->DIER |= TIM_DIER_UIE;    // Enable update interrupt
+    TIM2->CR1 |= TIM_CR1_CEN;      // Enable counter
 
     // Configure NVIC for TIM2
     NVIC_SetPriority(TIM2_IRQn, 1);
     NVIC_EnableIRQ(TIM2_IRQn);
-
-    // Initialize with LED 0 on
-    DigitalIO_SetLED(0, 1);
-    current_led = 0;
 }
 
-void DigitalIO_SetDelay(int enable) {
+// Function to enable or disable delay mode
+void set_delay(int enable) {
     if (enable) {
-        // Enable counter
-        TIM2->CR1 |= TIM_CR1_CEN;
+        initialise_delay();
     } else {
-        // Disable counter
+        // Optionally disable timer if not needed
         TIM2->CR1 &= ~TIM_CR1_CEN;
     }
 }
