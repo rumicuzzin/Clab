@@ -438,19 +438,81 @@ This module demonstrates how to implement a **software timer system** on the STM
 The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
 
 ### Functions:
-`enable_clocks()`  
+`enable_clocks()`
+```c
+void enable_clocks() {
+    // Enable the clock for the GPIO port of the LED
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOCEN | RCC_AHBENR_GPIOEEN;
+    // Enable the peripheral clock for timer 2
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN | RCC_APB1ENR_TIM2EN;;
+}
+```
 **Purpose:** Enables the necessary peripheral clocks for GPIO ports and Timer 2.
 **Inputs:** None  
 **Outputs:** None  
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
 
 `initialise_board()`  
+```c
+void initialise_board() {
+    // Get a pointer to the second half word of the MODER register (for outputs pe8-15)
+    uint16_t *led_output_registers = ((uint16_t *)&(GPIOE->MODER)) + 1;
+    *led_output_registers = 0x5555;
+    // Set all 8 LED's to output mode
+}
+```
 **Purpose:** Initializes the board I/O, configuring PE8-PE15 as outputs for the LEDs.  
 **Inputs:** None  
 **Outputs:** None  
 **Testing:** After calling this function, check that GPIOE->MODER has the correct configuration for pins 8-15.  
 
 `timer_init(uint32_t time_period_ms, callback_t cb)`  
+```c
+void timer_init(uint32_t time_period_ms, callback_t cb) {
+	// Disable the interrupts while messing around with the settings
+	//  otherwise can lead to strange behaviour
+	__disable_irq();
+
+
+    // Store the callback function
+    timer_callback = cb; // This stores the callback function to be used in the interrupt handler
+
+    // Disable interrupts for the timer
+    NVIC_DisableIRQ(TIM2_IRQn);
+    // Clear any pending interrupt
+    NVIC_ClearPendingIRQ(TIM2_IRQn);
+
+	// TIM2 is a 32 bit timer
+    // Set the timer prescaler
+    // Goal is to trigger an interrupt based on the provided time_period_ms
+    // time_period_ms = (PSC + 1) * (ARR + 1) / 8_000_000 * 1000
+
+    // For a 1ms timer tick: 8MHz / 8000 = 1kHz timer clock
+    TIM2->PSC = 7999;
+
+    // Calculate the auto-reload value based on the desired time period
+    // For example, if time_period_ms = 2000 (2 seconds), ARR = 1999
+    TIM2->ARR = (time_period_ms - 1);
+
+    // Disable Update Request Source (URS) bit
+    // This prevents update events from counter initialization
+    //TIM2->CR1 &= ~TIM_CR1_URS;
+
+    // Generate an update event to load the new settings
+    TIM2->EGR |= TIM_EGR_UG;
+    // Clear the update flag that was set by the UG bit
+    TIM2->SR &= ~TIM_SR_UIF;
+    // Enable update interrupt for Timer 2
+    TIM2->DIER |= TIM_DIER_UIE;
+
+    // Configure and enable Timer 2 interrupt in NVIC
+    NVIC_SetPriority(TIM2_IRQn, 1); // Set priority (0 is highest, 3 is lowest)
+    NVIC_EnableIRQ(TIM2_IRQn);      // Enable the Timer 2 interrupt in NVIC
+
+    // Re-enable all interrupts (now that we are finished)
+    __enable_irq();
+}
+```
 **Purpose:** Initializes Timer 2 with a specified time period and registers a callback function to be executed when the timer period elapses.  
 **Inputs:**
 - time_period_ms: The timer period in milliseconds
@@ -463,6 +525,27 @@ The core functionality involves using a timer interrupt to trigger a function (s
 - Check that TIM2->DIER has the UIE bit set for update interrupts
 
 `set_led()`  
+```c
+void set_led(void) {
+    // When we've reached LED 8, it means all LEDs are lit, so reset and turn all off
+    if (current_led >= 8) {
+        // Turn all LEDs off by setting bits 24-31 (which reset pins 8-15)
+    	GPIOE->BSRR = 0xFF000000;
+        // Reset the counter to start over
+        current_led = 0;
+        return;
+    }
+
+    // Calculate which LED to turn on (PE8 through PE15)
+    uint16_t led_pin = 1 << (8 + current_led);
+
+    // Turn on the current LED (without turning off others)
+    GPIOE->BSRR = led_pin;
+
+    // Move to the next LED
+    current_led++;
+}
+```
 **Purpose:** Handles LED sequencing, turning on LEDs in sequence from PE8 to PE15, and resets the sequence after all LEDs are lit.
 **Inputs**: None  
 **Outputs**: None  
@@ -471,12 +554,34 @@ The core functionality involves using a timer interrupt to trigger a function (s
 - Call the function a 9th time and verify all LEDs turn off (sequence resets)
 
 `enable_timer()`  
+```c
+void enable_timer(void) {
+    // Enable the Timer 2 counter
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+```
 **Purpose:**Enables the Timer 2 counter to start the timer operation.
 **Inputs:** None  
 **Outputs:** None  
 **Testing:** After calling this function, verify that TIM2->CR1 has the CEN bit set.  
 
 `set_new_period(uint32_t new_value)`  
+```c
+void set_new_period(uint32_t new_value){
+
+	// Stop the timer
+	TIM2->CR1 &= ~TIM_CR1_CEN;
+
+	// Set new period
+	TIM2->ARR = new_value;  // For 500ms (with prescaler of 7999) sets to half second
+
+	//reset the counter value to start fresh
+	TIM2->CNT = 0;
+
+	// Restart the timer
+	TIM2->CR1 |= TIM_CR1_CEN;
+}
+```
 **Purpose:** Resets the timer with a new period by stopping the timer, updating the period, and restarting it.  
 **Inputs:**
 - new_value: The new timer period value
@@ -487,6 +592,32 @@ The core functionality involves using a timer interrupt to trigger a function (s
 - Verify TIM2->CNT is reset to 0
 
 `GPIO_Button_Init()`  
+```c
+void GPIO_Button_Init(void)
+{
+  /* Enable clock for GPIOA and SYSCFG */
+  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;  // Enable GPIOA clock
+  RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN; // Enable SYSCFG clock
+
+  /* Configure PA0 as input with pull-down */
+  GPIOA->MODER &= ~(GPIO_MODER_MODER0); // Input mode (00)
+  GPIOA->PUPDR &= ~(GPIO_PUPDR_PUPDR0); // Clear pull-up/down
+  GPIOA->PUPDR |= GPIO_PUPDR_PUPDR0_1;  // Set pull-down (10)
+
+  /* Connect EXTI Line0 to PA0 */
+  SYSCFG->EXTICR[0] &= ~(SYSCFG_EXTICR1_EXTI0); // Clear EXTI line configuration
+  SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA; // PA0 as EXTI source
+
+  /* Configure EXTI Line0 */
+  EXTI->IMR |= EXTI_IMR_MR0;    // Enable interrupt on EXTI line 0
+  EXTI->RTSR |= EXTI_RTSR_TR0;  // Enable rising trigger
+  EXTI->FTSR &= ~EXTI_FTSR_TR0; // Disable falling trigger
+
+  /* Set NVIC priority and enable interrupt */
+  NVIC_SetPriority(EXTI0_IRQn, 1); // Set priority
+  NVIC_EnableIRQ(EXTI0_IRQn);      // Enable EXTI0 interrupt
+}
+```
 **Purpose:** Initializes the User Button (PA0) with interrupt capability for rising edge detection.  
 **Inputs:** None  
 **Outputs:** None  
@@ -496,6 +627,54 @@ The core functionality involves using a timer interrupt to trigger a function (s
 - Press the button and verify the button_pressed flag is set in the interrupt handler
 
 `one_shot_trigger(uint32_t delay, callback_t cb)`  
+```c
+void one_shot_trigger(uint32_t  delay_ms, callback_t cb_c) {
+    // Store the callback function for later use
+    oneshot_callback = cb_c;
+
+    // Disable interrupts while configuring the timer
+    __disable_irq();
+
+    // Configure timer for one-shot mode
+    // First, stop the timer if it's running
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+
+    // Disable the timer interrupt NVIC before clearing flags & clear flags
+    NVIC_DisableIRQ(TIM2_IRQn);
+    NVIC_ClearPendingIRQ(TIM2_IRQn);
+
+
+    // Set prescaler to create a 1ms time base (assuming 8MHz clock)
+    TIM2->PSC = 7999;  // For 1ms ticks (8MHz / 8000 = 1kHz)
+    // Set the auto-reload value based on the desired delay
+    TIM2->ARR = delay_ms;
+
+    // Generate an update event to load the new settings
+    TIM2->EGR |= TIM_EGR_UG;
+    // Clear the update flag that was set by the UG bit
+    TIM2->SR &= ~TIM_SR_UIF;
+    // Enable update interrupt for Timer 2
+    TIM2->DIER |= TIM_DIER_UIE;
+
+    // Set one-pulse mode (OPM=1) - this makes the timer stop after one update event
+    TIM2->CR1 |= TIM_CR1_OPM;
+
+    // Clear the uIF flag to not trigger an immediate event
+    TIM2->SR &= ~TIM_SR_UIF;
+    // Enable update interrupt
+    TIM2->DIER |= TIM_DIER_UIE;
+
+    // Configure and enable Timer 3 interrupt in NVIC
+    NVIC_SetPriority(TIM2_IRQn, 3);  // Lower priority than TIM2
+    NVIC_EnableIRQ(TIM2_IRQn);
+
+    // Re-enable interrupts
+    __enable_irq();
+
+    // Start the timer
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+```
 **Purpose:** Configures Timer 2 for one-shot operation, triggering the provided callback function once after the specified delay.  
 **Inputs:**
 - delay: The delay in milliseconds before the callback function is executed
@@ -509,6 +688,18 @@ The core functionality involves using a timer interrupt to trigger a function (s
 
 
 `flash_led()`  
+```c
+void flash_led(void) {
+
+	// Turn all LEDs off by setting bits 24-31 (which reset pins 8-15)
+	GPIOE->BSRR = 0xFF000000;
+	// Set LED1 mask
+	uint16_t led_pin = 2 << 8;
+	// Turn on LED1
+	GPIOE->BSRR = led_pin;
+
+}
+```
 **Purpose:** Turns off all LEDs and then flashes LED1 (PE9).  
 **Inputs:** None  
 **Outputs:** None  
