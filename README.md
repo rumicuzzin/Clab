@@ -93,30 +93,26 @@ void USART1_SendChar(unsigned char c)
 Sends a single character over UART.
 
 **Input:**
-c: Character to transmit
+- c: Character to transmit
 
 **Output:**
-Transmits the character via UART
+- Transmits the character via UART
 
 **Constraints:**
-Blocking function that waits until the transmit data register is empty
+- Blocking function that waits until the transmit data register is empty
 
-USART1_SendString(const char* str)
-Purpose: Sends a null-terminated string over UART.
-Input:
+#### `USART1_SendString(const char* str)`
+**Purpose:** Sends a null-terminated string over UART.
 
-str: Pointer to the null-terminated string to transmit
+**Input:**
+- str: Pointer to the null-terminated string to transmit
 
-Output:
+**Output:**
+- Transmits each character in the string
+- Automatically adds carriage return ('\r') and line feed ('\n') at the end
 
-Transmits each character in the string
-Automatically adds carriage return ('\r') and line feed ('\n') at the end
-
-Constraints:
-
-Calls the blocking USART1_SendChar function
-
-
+**Constraints:**
+- Calls the blocking USART1_SendChar function
 
 ---
 
