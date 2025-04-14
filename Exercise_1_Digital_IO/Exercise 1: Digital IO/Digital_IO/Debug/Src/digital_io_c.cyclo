@@ -1,7 +1,0 @@
-../Src/digital_io_c.c:14:13:chaseLed	2
-../Src/digital_io_c.c:33:6:DigitalIO_InitStateTracking	1
-../Src/digital_io_c.c:47:6:DigitalIO_C_SetLED	3
-../Src/digital_io_c.c:66:6:DigitalIO_C_SetLEDPattern	1
-../Src/digital_io_c.c:78:9:DigitalIO_GetLEDState	2
-../Src/digital_io_c.c:90:9:DigitalIO_GetLEDPattern	1
-../Src/digital_io_c.c:97:6:DigitalIO_RunMonitoringDemo	2
