@@ -73,6 +73,16 @@ Uses polling to handle UART transmission and reception while monitoring for a te
 - **Periodic transmission**: Of a predefined string message
 - **LED toggle**: When terminator character is received
 - Echo of **received buffer contents** after terminator detection
+---
+#### `SerialOutputChar()`
+
+```c
+void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
+	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
+	}
+	serial_port->UART->TDR = data;
+}
+```
 
 #### `SerialOutputString()`
 ```c
