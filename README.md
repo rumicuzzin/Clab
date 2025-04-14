@@ -63,15 +63,14 @@
 ### Part c)
 
 ### Part d) Advanced Functionality
-Features: 
+#### Features: 
 - **Serial Communication**: 115200 baud UART with interrupt-driven RX
 - **LED Control**: GPIO interface for 8 LEDs (Port E)
 - **Command Framework**: Buffered input system with `processBuffer` callback
 - **Dual-buffer receive system**: With interrupt handling and buffer switching
 
-## 🔄 Function Inputs and Outputs
 
-### `SerialInitialise()`
+#### `SerialInitialise()`
 
 **Purpose:**  
 Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with a terminator character.
@@ -88,7 +87,7 @@ Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with
 
 ---
 
-### `USART1_EXTI25_IRQHandler()`
+#### `USART1_EXTI25_IRQHandler()`
 
 **Purpose:**  
 Interrupt Service Routine for USART1 — handles incoming characters, detects terminator, manages double-buffering, and triggers the parsing callback.
@@ -102,7 +101,7 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 
 ---
 
-### `SerialOutputString()`
+#### `SerialOutputString()`
 
 **Purpose:**  
 Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
@@ -117,7 +116,7 @@ Transmits a **null-terminated string** over USART1 using blocking (polling) tran
 
 ---
 
-### `processBuffer()`
+#### `processBuffer()`
 
 **Purpose:**  
 Custom user-defined callback to process a fully received buffer (inactive buffer after terminator character).
@@ -131,7 +130,7 @@ Custom user-defined callback to process a fully received buffer (inactive buffer
   You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
 
 
-### Discussion Points
+#### Discussion Points
 
 ---
 
