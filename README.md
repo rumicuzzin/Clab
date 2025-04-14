@@ -16,10 +16,9 @@
 - [Project Overview](#project-overview)
 - [Team Members](#team-members)
 - [Exercise 1: Digital I/O](#exercise-1-digital-io)
-  - [Part a) Basic Functionality](#part-a-basic-functionality)
-  - [Part b)](#part-b) 
-  - [Part c)](#part-c)
-  - [Part d) Advanced Functionality](#part-d-advanced-functionality)
+  - [Overview](#part-a-basic-functionality)
+  - [Functions](#part-b) 
+  - [Limitations](#part-c)
   - [Discussion Points](#discussion-points)
 - [Exercise 2: Serial Interface](#exercise-2-serial-interface)
   - [Part a) Basic Functionality](#part-a-basic-functionality-1)
@@ -42,23 +41,240 @@
 
 ## Exercise 1: Digital I/O
 
-### Part a) Basic Functionality
-The Digital I/O module provides a simple interface for controlling the LEDs on the STM32F3 Discovery board and reading the state of the user button. This implementation covers the basic requirements for digital I/O control.
+### Overview
+The Digital I/O module provides a comprehensive interface for controlling the LEDs on the STM32F3 Discovery board and reading the state of the user button. This implementation covers the basic requirements for digital I/O control.
 Key Features:
-
-- **LED Control**: Interface to control the 8 LEDs (PE8-PE15) individually
-- **Button Reading**: Detection of user button (PA0) state
-- **Hardware Abstraction**: Encapsulation of register access and bit manipulation
 
 
   
-### Part b)
+### Functions
+`DigitalIO_Init(ButtonCallback callback)` 
+```c
+oid DigitalIO_Init(ButtonCallback callback) {
+    // Store the callback function
+    buttonCallback = callback;
+
+    // Enable clocks for GPIOA (button) and GPIOE (LEDs)
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOEEN;
+
+    // Configure PE8-PE15 (LEDs) as outputs
+    uint16_t *led_output_registers = ((uint16_t *)&(GPIOE->MODER)) + 1;
+    *led_output_registers = 0x5555; // Set as outputs (01 pattern for each pin)
+
+    // Configure PA0 (User button) as input (default state)
+    // No need to modify GPIOA->MODER since input is 00 (default)
+
+    // Configure with pull-down (button connects to VDD when pressed)
+    GPIOA->PUPDR &= ~(0x3);
+    GPIOA->PUPDR |= 0x2; // Pull-down (10 pattern)
+
+    // Turn off all LEDs initially
+    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+    *led_register = 0;
+
+    // Set up button interrupt
+    // Disable interrupts while configuring
+    __disable_irq();
+
+    // Enable system configuration controller
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+    // Connect PA0 to EXTI0
+    SYSCFG->EXTICR[0] &= ~(0xF); // Clear EXTI0 bits
+    SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA; // PA[0] to EXTI0
+
+    // Configure EXTI0 line for rising edge trigger (button press)
+    EXTI->RTSR |= EXTI_RTSR_TR0; // Rising edge trigger
+    EXTI->IMR |= EXTI_IMR_MR0; // Enable interrupt on line 0
+
+    // Enable EXTI0 interrupt in NVIC
+    NVIC_SetPriority(EXTI0_IRQn, 1);
+    NVIC_EnableIRQ(EXTI0_IRQn);
+
+    // Re-enable interrupts
+    __enable_irq();
+}
+
+```
+
+**Purpose:** Intialises the DIO module with button callback functionality
+- Enables clock for GPIOA (button) and GPIOE (LEDs)
+- Configures PE8-PE15 (LEDs) as outputs
+- Configures button interrupt on PA0
+- Store the provided callback function
+**Input:** `callback`: Function pointer to be called when button is pressed  
+**Output:** None  
+**Testing:** Intialise with a callback function and verify it gets called when button is pressed    
+
+`DigitalIO_SetLED(uint8_t ledNumber, uint8_t state)`
+```c
+void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
+    // Validate LED number (0-7)
+    if (ledNumber > 7)
+        return;
+
+    // Get pointer to LED register
+    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+
+    if (state)
+        *led_register |= (1 << ledNumber);  // Set bit
+    else
+        *led_register &= ~(1 << ledNumber); // Clear bit
+}
+```
+**Purpose:** Sets the state of a specific LED
+- Controls a single LED based on the LED number (0-7 corresponding to LD3-LD10)
+- State parameter determines whether to turn on (non-zero) or off (zero) the LED
+
+**Input:**
+- `ledNumber`: LED number (0-7) corresponding to LD3-LD10
+- `state`: 0 to turn off, non-zero to turn on
+**Output:** None  
+**Testing:** Turn each LED on and off individually and verify visually  
+
+`DigitalIO_ReadButton_a()`
+```c
+uint8_t DigitalIO_ReadButton_a(void) {
+    // Read button state from PA0
+    return (GPIOA->IDR & GPIO_IDR_0) ? 1 : 0;
+}
+```
+**Purpose:** Reads the current state of the user button  
+**Input:** None  
+**Output:**
+- 1 if button is pressed
+- 0 if button is not pressed  
+**Testing:** Press the button and verify the function returns 1, release and verify it returns 0  
+
+
+`DigitalIO_SetButtonCallback(ButtonCallback callback)`
+```c
+void DigitalIO_SetButtonCallback(ButtonCallback callback) {
+    buttonCallback = callback;
+}
+```
+**Purpose:** Sets the callback function for button press events.
+**Input:** `callback`: New function pointer to be called when button is pressed   
+**Output:** None  
+**Testing:** Change callback to different functions and verify the new function is called on button press
+
+
+`get_led_state()`
+```c
+// Get function
+uint8_t get_led_state(){
+	return current_led;
+}
+```
+**Purpose:**  Gets the current LED state (which LED is active).  
+**Input:** None  
+**Output:** Current active LED number (0-7)  
+**Testing:** Verify that the returned value matches the current LED
+
+
+`set_led_state(uint8_t new_val)`
+```c
+// Set function
+void set_led_state(uint8_t new_val){
+	current_led = new_val;
+}
+```
+**Purpose:** Sets the current LED state (which LED should be active).  
+**Input:** `new_val`: New LED number (0-7)  
+**Output:** None  
+**Testing:** Verify that changing the LED state actually updates the internal state variable.
+
+
+`next_led()`
+```c
+// Callback function - moves to next LED
+void next_led(void) {
+    // Turn off current LED
+    DigitalIO_SetLED(get_led_state(), 0);
+
+    // Move to next LED
+    set_led_state((get_led_state()+1) % 8);
+
+
+    // Turn on new current LED
+    DigitalIO_SetLED(get_led_state(), 1);
+}
+```
+**Purpose:** Callback function that moves to the next LED in sequence.  
+**Input:** None  
+**Output:** None  
+**Testing:** Verify that calling this function cycles to the next LED.
 
 
 
-### Part c)
+`new_callback_function()`
+```c
+void new_callback_function(void){
+// If there is no delay, act as normal
+	if (led_move == LED_IDLE) {
+		led_move = LED_MOVE_PENDING;
 
-### Part d) Advanced Functionality
+	}
+}
+
+```
+**Purpose:** Button press callback that sets the LED move state to pending instead of immediately moving the LED  
+**Input:** None  
+**Output:** None  
+**Testing:** Verify that button presses update the LED state to pending without immediately changing LEDs
+
+
+
+`initialise_delay()`
+```c
+// Timer initialization
+void initialise_delay(void) {
+    // Enable clock for TIM2
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+    // Configure TIM2 for periodic checking (e.g., every 500ms)
+    TIM2->PSC = 7999;          // in terms of 1 ms
+    TIM2->ARR = 2999;          // Get a 3 second delay
+    TIM2->DIER |= TIM_DIER_UIE;    // Enable update interrupt
+    TIM2->CR1 |= TIM_CR1_CEN;      // Enable counter
+
+    // Configure NVIC for TIM2
+    NVIC_SetPriority(TIM2_IRQn, 1);
+    NVIC_EnableIRQ(TIM2_IRQn);
+}
+```
+**Purpose:** Initialises the timer for delayed LED response.  
+**Input:** None 
+**Output:** None  
+**Testing:** Verify that the timer is properly initialized and interrupts are generated.
+
+`set_delay(int enable)`
+```c
+// Function to enable or disable delay mode
+void set_delay(int enable) {
+    if (enable) {
+        initialise_delay();
+    } else {
+        // Optionally disable timer if not needed
+        TIM2->CR1 &= ~TIM_CR1_CEN;
+    }
+}
+```
+**Purpose:** Enables or disables the delay mode.  
+**Input:** `enable`: 1 to enable delay, 0 to disable 
+**Output:** None  
+**Testing:** Verify that enabling/disabling delay mode changes the behavior of button responses..
+
+
+### Limitations
+- Concurrency Issues
+- Callback blocking
+- Single button
+- Fixed delay time
+- No Debouncing
+- No error handling
+- Resource conflicts
+
 ![Digital IO diagram](diagrams/DigitalIO.png)
 
 
