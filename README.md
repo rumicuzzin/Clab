@@ -100,7 +100,7 @@ Sends a single character over UART.
 
 **Constraints:**
 - Blocking function that waits until the transmit data register is empty
-
+---
 #### `USART1_SendString(const char* str)`
 
 ```c
@@ -149,10 +149,10 @@ Uses predefined constants:
 - RXTX: Alternate function register value
 - HIGHSPEED: GPIO speed configuration
 - BAUDRATE: Value for 115200 baud rate
-
+---
 `enableLEDs()`
 - Configures the GPIO pins for LED control
-
+---
 ### Part b)
 #### `processBuffer()`
 
