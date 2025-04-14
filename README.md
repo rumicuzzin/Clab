@@ -214,6 +214,23 @@ void processBuffer(unsigned char* buffer, int size);
 - Specific to USART1 only
 - Disables all interrupts briefly during configuration
 
+##### `USART1_EXTI25_IRQHandler()`
+**Purpose:** Interrupt handler for USART1 reception events
+**Input:**
+- None (called automatically by hardware on interrupt)
+
+**Output:**
+- Updates global buffer with received character
+- Toggles LED for visual feedback
+
+**Limitations:**
+- Uses global variables (string buffer and index)
+- Fixed buffer size (10 bytes)
+- Limited error handling (only checks for overrun and frame errors)
+- No terminator character detection
+- No callback or signal when buffer is full
+- No double buffering to prevent data loss during processing
+
 ---
 ### Part d) Advanced Functionality
 #### Features: 
