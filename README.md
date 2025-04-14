@@ -181,9 +181,11 @@ void processBuffer(unsigned char* buffer, int size);
 - Limited Buffer Protection: It assumes the buffer has space for a null terminator and doesn't verify this before writing to buffer[size]
 - No Return Status: There's no way for the function to indicate success or failure back to the calling system.
 
-
+---
 ### Part c)
 
+
+---
 ### Part d) Advanced Functionality
 #### Features: 
 - **Serial Communication**: 115200 baud UART with interrupt-driven RX
@@ -383,7 +385,7 @@ The core functionality involves using a timer interrupt to trigger a function (s
 ### Functions:
 `enable_clocks()`
 **Purpose:**
-Enables the necessary peripheral clocks for GPIO ports and Timer 2.
+Enables the necessary peripheral clocks for GPIO ports and Timer 2.  
 **Inputs:** None
 **Outputs:** None
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
