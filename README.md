@@ -100,7 +100,7 @@ Sends a single character over UART.
 
 **Constraints:**
 - Blocking function that waits until the transmit data register is empty
-
+---
 #### `USART1_SendString(const char* str)`
 
 ```c
@@ -149,10 +149,10 @@ Uses predefined constants:
 - RXTX: Alternate function register value
 - HIGHSPEED: GPIO speed configuration
 - BAUDRATE: Value for 115200 baud rate
-
+---
 `enableLEDs()`
 - Configures the GPIO pins for LED control
-
+---
 ### Part b)
 #### `processBuffer()`
 
@@ -171,13 +171,50 @@ void processBuffer(unsigned char* buffer, int size);
 	parseCommand(buffer);
  }
 ```
-**Purpose:** Callback
-- Process Asynchronous Communications
 
-- gets triggered when the UART reception system has collected a complete set of data
+**Purpose:** Callback Function
+- Process Asynchronous Communications - Since UART data arrives asynchronously (at any time), the callback architecture allows the system to respond to incoming data without constantly polling the UART
+- Bridges Hardware and Application: It serves as the handoff point between the low-level UART hardware handling (receiving bytes) and the higher-level application logic (interpreting commands)
 
+**Limitations:**
+- No Error Handling: There's no mechanism to handle malformed commands or unexpected data, which could lead to unpredictable behavior.
+- Limited Buffer Protection: It assumes the buffer has space for a null terminator and doesn't verify this before writing to buffer[size]
+- No Return Status: There's no way for the function to indicate success or failure back to the calling system.
+
+---
 ### Part c)
+**Features:**
+- Interrupt-Driven Reception: UART reception using interrupts to avoid blocking
 
+##### `SerialInitialise()`
+**Purpose:** Initializes a serial port with specified baud rate and callback function.
+**Input:**
+- baudRate (uint32_t): Enumerated baud rate value (BAUD_9600, BAUD_19200, etc.)
+- serial_port (SerialPort*): Pointer to the serial port structure to initialize
+- completion_function (function pointer): Callback function invoked after string transmission
+
+**Output:**
+- Configured UART peripheral and associated GPIO pins
+
+**Limitations:**
+- Only some baud rate configurations are implemented
+- Fixed at 8MHz clock assumption for baud rate calculation
+- No parity, stop bit, or word length configuration options
+
+##### `USART1RX_enableInterrupts()`
+**Purpose:** Enables interrupt-driven reception for USART1.
+**Input:**
+- None
+
+**Output:**
+- Configured USART1 to generate interrupts on reception
+- Configured NVIC (Nested Vectored Interrupt Controller)
+
+**Limitations:**
+- Specific to USART1 only
+- Disables all interrupts briefly during configuration
+
+---
 ### Part d) Advanced Functionality
 #### Features: 
 - **Serial Communication**: 115200 baud UART with interrupt-driven RX
@@ -375,10 +412,18 @@ This module demonstrates how to implement a **software timer system** on the STM
 The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
 
 ### Functions:
+<<<<<<< HEAD
 `enable_clocks()`  
 **Purpose:** Enables the necessary peripheral clocks for GPIO ports and Timer 2.
 **Inputs:** None  
 **Outputs:** None  
+=======
+`enable_clocks()`
+**Purpose:**
+Enables the necessary peripheral clocks for GPIO ports and Timer 2.  
+**Inputs:** None
+**Outputs:** None
+>>>>>>> beeedf3229a20230b55905fab9fdacba36f760e1
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
 
 `initialise_board()`  
