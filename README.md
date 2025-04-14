@@ -171,10 +171,16 @@ void processBuffer(unsigned char* buffer, int size);
 	parseCommand(buffer);
  }
 ```
+```
 **Purpose:** Callback
-- Process Asynchronous Communications
+- Process Asynchronous Communications - Since UART data arrives asynchronously (at any time), the callback architecture allows the system to respond to incoming data without constantly polling the UART
+- Bridges Hardware and Application: It serves as the handoff point between the low-level UART hardware handling (receiving bytes) and the higher-level application logic (interpreting commands)
 
-- gets triggered when the UART reception system has collected a complete set of data
+**Limitations:**
+- No Error Handling: There's no mechanism to handle malformed commands or unexpected data, which could lead to unpredictable behavior.
+- Limited Buffer Protection: It assumes the buffer has space for a null terminator and doesn't verify this before writing to buffer[size]
+- No Return Status: There's no way for the function to indicate success or failure back to the calling system.
+
 
 ### Part c)
 
