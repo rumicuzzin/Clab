@@ -165,7 +165,7 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 	}
 	serial_port->completion_function(counter);
 }
-'''
+```
 
 **Purpose:**  
 Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
