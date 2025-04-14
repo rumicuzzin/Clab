@@ -145,6 +145,7 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
   Processes buffers and calls `rx_complete_callback()` internally.
 
 **Double Buffer Functionality:**
+![Double Buffer Diagram](diagrams/Serial-Buffer.png)
 
 
 ---
