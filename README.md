@@ -102,6 +102,23 @@ Sends a single character over UART.
 - Blocking function that waits until the transmit data register is empty
 
 #### `USART1_SendString(const char* str)`
+
+```c
+// Function to send a string
+void USART1_SendString(const char* str)
+{
+    while(*str)
+    {
+        USART1_SendChar(*str++);
+    }
+
+
+    // Send carriage return and line feed for proper line ending in terminal
+    USART1_SendChar('\r');
+    USART1_SendChar('\n');
+}
+```
+
 **Purpose:** Sends a null-terminated string over UART.
 
 **Input:**
@@ -116,8 +133,25 @@ Sends a single character over UART.
 
 ---
 
-Other functions used:
-`enableUSART1()`, `enableLEDs()`
+#### `enableUSART1()`, 
+**Purpose:** Initializes and configures the USART1 peripheral and its GPIO pins
+
+**Input:**
+- None
+
+**Output:**
+- Configures GPIO Port C for UART alternate function
+- Sets up USART1 for 115200 baud rate with receive and transmit enabled
+
+**Configuration:**
+Uses predefined constants:
+- ALTFUNCTION: GPIO alternate function mode
+- RXTX: Alternate function register value
+- HIGHSPEED: GPIO speed configuration
+- BAUDRATE: Value for 115200 baud rate
+
+`enableLEDs()`
+- Configures the GPIO pins for LED control
 
 ### Part b)
 #### `processBuffer()`
