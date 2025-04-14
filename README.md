@@ -215,7 +215,6 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 
 ![Double Buffer Diagram](diagrams/Serial-Buffer.png)
 
-![Double Buffer Diagram2](diagrams/Serial.jpg)
 
 ---
 
