@@ -69,6 +69,23 @@ Features:
 - **Command Framework**: Buffered input system with `processBuffer` callback
 - **Dual-buffer receive system**: With interrupt handling and buffer switching
 
+Functions: 
+- `SerialInitialise()`:  
+  Initializes **USART1**, sets the baud rate, configures GPIO pins for alternate functions, and enables interrupts. Also assigns a user-defined terminator character and a callback function to process received data.
+
+- `USART1_EXTI25_IRQHandler()`:  
+  Interrupt handler that gets triggered on receiving data over USART1.  
+  It:
+  - Reads incoming characters into the active buffer.
+  - Checks for the termination character.
+  - Swaps to the alternate buffer.
+  - Calls the user-defined callback (`processBuffer`) to process the full buffer.
+
+- `SerialOutputString()`:  
+  Sends a **null-terminated string** over USART1, one character at a time, using polling (waits for transmit buffer to be ready).
+
+- 'processBuffer()': User-defined RX callback — processes the inactive buffer once full or terminated
+
 ### Discussion Points
 
 ---
