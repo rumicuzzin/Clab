@@ -101,7 +101,7 @@ oid DigitalIO_Init(ButtonCallback callback) {
 - Enables clock for GPIOA (button) and GPIOE (LEDs)
 - Configures PE8-PE15 (LEDs) as outputs
 - Configures button interrupt on PA0
-- Store the provided callback function
+- Store the provided callback function  
 **Input:** `callback`: Function pointer to be called when button is pressed  
 **Output:** None  
 **Testing:** Intialise with a callback function and verify it gets called when button is pressed    
