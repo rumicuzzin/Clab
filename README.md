@@ -84,28 +84,6 @@ void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
 }
 ```
 
-#### `SerialOutputString()`
-```c
-void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
-	uint32_t counter = 0;
-	while(*pt) {
-		SerialOutputChar(*pt, serial_port);
-		counter++;
-		pt++;
-	}
-	serial_port->completion_function(counter);
-}
-```
-**Purpose:**  
-Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
-
-**Input:**
-- `uint8_t *pt` — Pointer to the null-terminated string to be sent  
-- `SerialPort *serial_port` — Pointer to the USART config struct
-
-**Output:**
-- *None (void function)*  
-  Sends each character over the TX register.
 
 ---
 
@@ -296,6 +274,28 @@ Custom user-defined callback (part b) to process a fully received buffer (inacti
   You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
 
 
+#### `SerialOutputString()`
+```c
+void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
+	uint32_t counter = 0;
+	while(*pt) {
+		SerialOutputChar(*pt, serial_port);
+		counter++;
+		pt++;
+	}
+	serial_port->completion_function(counter);
+}
+```
+**Purpose:**  
+Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
+
+**Input:**
+- `uint8_t *pt` — Pointer to the null-terminated string to be sent  
+- `SerialPort *serial_port` — Pointer to the USART config struct
+
+**Output:**
+- *None (void function)*  
+  Sends each character over the TX register.
 
 
 #### Discussion Points
