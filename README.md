@@ -89,7 +89,7 @@ Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with
 
 #### `USART1_EXTI25_IRQHandler()`
 
-<div style="max-height: 100px; overflow-y: auto; background-color: #f6f8fa; border-radius: 3px; padding: 8px;">
+<div style="max-height: 20px; overflow-y: auto; background-color: #f6f8fa; border-radius: 3px; padding: 8px;">
 
 ```c
 void USART1_EXTI25_IRQHandler() {
