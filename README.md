@@ -1,4 +1,4 @@
-# Clab MTRX2700 C Lab for STM32F3 Discovery Board
+# MTRX2700 C Lab for STM32F3Discovery Board
 
 ## Project Overview
 
@@ -16,11 +16,9 @@
 - [Project Overview](#project-overview)
 - [Team Members](#team-members)
 - [Exercise 1: Digital I/O](#exercise-1-digital-io)
-  - [Part a) Basic Functionality](#part-a-basic-functionality)
-  - [Part b)](#part-b) 
-  - [Part c)](#part-c)
-  - [Part d) Advanced Functionality](#part-d-advanced-functionality)
-  - [Discussion Points](#discussion-points)
+  - [Overview](#part-a-basic-functionality)
+  - [Functions](#part-b) 
+  - [Limitations](#part-c)
 - [Exercise 2: Serial Interface](#exercise-2-serial-interface)
   - [Part a) Basic Functionality](#part-a-basic-functionality-1)
   - [Part b)](#part-b-1)
@@ -29,7 +27,7 @@
   - [Discussion Points](#discussion-points-1)
 - [Exercise 3: Timer Interface](#exercise-3-timer-interface)
   - [Overview](#overview)
-  - [Functions)](#Functions)
+  - [Functions](#Functions)
   - [Limitations)](#Limitations)
   - [Discussion Points](#discussion-points-2)
 - [Exercise 4: Integration Task](#exercise-4-integration-task)
@@ -42,23 +40,278 @@
 
 ## Exercise 1: Digital I/O
 
-### Part a) Basic Functionality
-The Digital I/O module provides a simple interface for controlling the LEDs on the STM32F3 Discovery board and reading the state of the user button. This implementation covers the basic requirements for digital I/O control.
+### Overview
+The Digital I/O module provides a comprehensive interface for controlling the LEDs on the STM32F3 Discovery board and reading the state of the user button. This implementation covers the basic requirements for digital I/O control.
 Key Features:
-
-- **LED Control**: Interface to control the 8 LEDs (PE8-PE15) individually
-- **Button Reading**: Detection of user button (PA0) state
-- **Hardware Abstraction**: Encapsulation of register access and bit manipulation
 
 
   
-### Part b)
+### Functions
+#### `DigitalIO_Init(ButtonCallback callback)` 
+```c
+oid DigitalIO_Init(ButtonCallback callback) {
+    // Store the callback function
+    buttonCallback = callback;
+
+    // Enable clocks for GPIOA (button) and GPIOE (LEDs)
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOEEN;
+
+    // Configure PE8-PE15 (LEDs) as outputs
+    uint16_t *led_output_registers = ((uint16_t *)&(GPIOE->MODER)) + 1;
+    *led_output_registers = 0x5555; // Set as outputs (01 pattern for each pin)
+
+    // Configure PA0 (User button) as input (default state)
+    // No need to modify GPIOA->MODER since input is 00 (default)
+
+    // Configure with pull-down (button connects to VDD when pressed)
+    GPIOA->PUPDR &= ~(0x3);
+    GPIOA->PUPDR |= 0x2; // Pull-down (10 pattern)
+
+    // Turn off all LEDs initially
+    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+    *led_register = 0;
+
+    // Set up button interrupt
+    // Disable interrupts while configuring
+    __disable_irq();
+
+    // Enable system configuration controller
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+    // Connect PA0 to EXTI0
+    SYSCFG->EXTICR[0] &= ~(0xF); // Clear EXTI0 bits
+    SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PA; // PA[0] to EXTI0
+
+    // Configure EXTI0 line for rising edge trigger (button press)
+    EXTI->RTSR |= EXTI_RTSR_TR0; // Rising edge trigger
+    EXTI->IMR |= EXTI_IMR_MR0; // Enable interrupt on line 0
+
+    // Enable EXTI0 interrupt in NVIC
+    NVIC_SetPriority(EXTI0_IRQn, 1);
+    NVIC_EnableIRQ(EXTI0_IRQn);
+
+    // Re-enable interrupts
+    __enable_irq();
+}
+
+```
+
+**Purpose:** Initialises the DIO module with button callback functionality  
+- Enables clock for GPIOA (button) and GPIOE (LEDs)  
+- Configures PE8–PE15 (LEDs) as outputs  
+- Configures button interrupt on PA0  
+- Stores the provided callback function  
+
+**Input:** `callback`: Function pointer to be called when button is pressed  
+
+**Output:** None  
+
+**Testing:** Initialise with a callback function and verify it gets called when button is pressed    
+
+#### `DigitalIO_SetLED(uint8_t ledNumber, uint8_t state)`
+```c
+void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
+    // Validate LED number (0-7)
+    if (ledNumber > 7)
+        return;
+
+    // Get pointer to LED register
+    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+
+    if (state)
+        *led_register |= (1 << ledNumber);  // Set bit
+    else
+        *led_register &= ~(1 << ledNumber); // Clear bit
+}
+```
+**Purpose:** Sets the state of a specific LED  
+- Controls a single LED based on the LED number (0–7, corresponding to LD3–LD10)  
+- `state` determines whether to turn on (non-zero) or off (zero) the LED  
+
+**Input:**  
+- `ledNumber`: LED number (0–7)  
+- `state`: 0 to turn off, non-zero to turn on  
+
+**Output:** None  
+
+**Testing:** Turn each LED on and off individually and verify visually  
+
+---
+#### `DigitalIO_ReadButton_a()`
+```c
+uint8_t DigitalIO_ReadButton_a(void) {
+    // Read button state from PA0
+    return (GPIOA->IDR & GPIO_IDR_0) ? 1 : 0;
+}
+```
+**Purpose:** Reads the current state of the user button  
+
+**Input:** None  
+
+**Output:**  
+- `1` if button is pressed  
+- `0` if button is not pressed  
+
+**Testing:** Press the button and verify the function returns `1`. Release and verify it returns `0`.  
+
+---
+
+
+#### `DigitalIO_SetButtonCallback(ButtonCallback callback)`
+```c
+void DigitalIO_SetButtonCallback(ButtonCallback callback) {
+    buttonCallback = callback;
+}
+```
+**Purpose:** Sets the callback function for button press events  
+
+**Input:** `callback`: Function pointer to be called when button is pressed  
+
+**Output:** None  
+
+**Testing:** Change the callback to different functions and verify the correct one is triggered on button press  
+
+---
+#### `get_led_state()`
+```c
+// Get function
+uint8_t get_led_state(){
+	return current_led;
+}
+```
+**Purpose:** Gets the current LED state (i.e. which LED is active)  
+
+**Input:** None  
+
+**Output:** Current active LED number (0–7)  
+
+**Testing:** Verify that the returned value matches the currently active LED  
+
+---
+#### `set_led_state(uint8_t new_val)`
+```c
+// Set function
+void set_led_state(uint8_t new_val){
+	current_led = new_val;
+}
+```
+**Purpose:** Sets the current LED state (i.e. which LED should be active)  
+
+**Input:** `new_val`: New LED number (0–7)  
+
+**Output:** None  
+
+**Testing:** Verify that changing the LED state updates the internal state variable  
+
+---
+
+
+#### `next_led()`
+```c
+// Callback function - moves to next LED
+void next_led(void) {
+    // Turn off current LED
+    DigitalIO_SetLED(get_led_state(), 0);
+
+    // Move to next LED
+    set_led_state((get_led_state()+1) % 8);
+
+
+    // Turn on new current LED
+    DigitalIO_SetLED(get_led_state(), 1);
+}
+```
+*Purpose:** Callback function that moves to the next LED in sequence  
+
+**Input:** None  
+
+**Output:** None  
+
+**Testing:** Verify that calling this function cycles to the next LED  
+
+---
 
 
 
-### Part c)
+#### `new_callback_function()`
+```c
+void new_callback_function(void){
+// If there is no delay, act as normal
+	if (led_move == LED_IDLE) {
+		led_move = LED_MOVE_PENDING;
 
-### Part d) Advanced Functionality
+	}
+}
+
+```
+**Purpose:** Button press callback that sets the LED move state to pending (does not immediately change the LED)  
+
+**Input:** None  
+
+**Output:** None  
+
+**Testing:** Verify that button presses set the state to pending without immediately changing LEDs  
+
+---
+
+#### `initialise_delay()`
+```c
+// Timer initialization
+void initialise_delay(void) {
+    // Enable clock for TIM2
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+    // Configure TIM2 for periodic checking (e.g., every 500ms)
+    TIM2->PSC = 7999;          // in terms of 1 ms
+    TIM2->ARR = 2999;          // Get a 3 second delay
+    TIM2->DIER |= TIM_DIER_UIE;    // Enable update interrupt
+    TIM2->CR1 |= TIM_CR1_CEN;      // Enable counter
+
+    // Configure NVIC for TIM2
+    NVIC_SetPriority(TIM2_IRQn, 1);
+    NVIC_EnableIRQ(TIM2_IRQn);
+}
+```
+**Purpose:** Initialises the timer for delayed LED response  
+
+**Input:** None  
+
+**Output:** None  
+
+**Testing:** Verify that the timer is initialised and generates interrupts  
+
+---
+
+#### `set_delay(int enable)`
+```c
+// Function to enable or disable delay mode
+void set_delay(int enable) {
+    if (enable) {
+        initialise_delay();
+    } else {
+        // Optionally disable timer if not needed
+        TIM2->CR1 &= ~TIM_CR1_CEN;
+    }
+}
+```
+*Purpose:** Enables or disables delay mode  
+
+**Input:** `enable`: `1` to enable delay, `0` to disable  
+
+**Output:** None  
+
+**Testing:** Verify that enabling/disabling delay changes the behaviour of button responses  
+---
+
+### Limitations
+- Concurrency Issues
+- Callback blocking
+- Single button
+- Fixed delay time
+- No Debouncing
+- No error handling
+- Resource conflicts
+
 ![Digital IO diagram](diagrams/DigitalIO.png)
 
 
@@ -435,7 +688,7 @@ This module demonstrates how to implement a **software timer system** on the STM
 The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
 
 ### Functions:
-`enable_clocks()`
+#### `enable_clocks()`
 ```c
 void enable_clocks() {
     // Enable the clock for the GPIO port of the LED
@@ -449,7 +702,8 @@ void enable_clocks() {
 **Outputs:** None  
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
 
-`initialise_board()`  
+---
+### `initialise_board()`  
 ```c
 void initialise_board() {
     // Get a pointer to the second half word of the MODER register (for outputs pe8-15)
@@ -463,7 +717,8 @@ void initialise_board() {
 **Outputs:** None  
 **Testing:** After calling this function, check that GPIOE->MODER has the correct configuration for pins 8-15.  
 
-`timer_init(uint32_t time_period_ms, callback_t cb)`  
+---
+### `timer_init(uint32_t time_period_ms, callback_t cb)`  
 ```c
 void timer_init(uint32_t time_period_ms, callback_t cb) {
 	// Disable the interrupts while messing around with the settings
@@ -521,7 +776,8 @@ void timer_init(uint32_t time_period_ms, callback_t cb) {
 - Initialize with a test callback and trigger the timer to verify the callback is executed
 - Check that TIM2->DIER has the UIE bit set for update interrupts
 
-`set_led()`  
+---
+### `set_led()`  
 ```c
 void set_led(void) {
     // When we've reached LED 8, it means all LEDs are lit, so reset and turn all off
@@ -543,26 +799,28 @@ void set_led(void) {
     current_led++;
 }
 ```
-**Purpose:** Handles LED sequencing, turning on LEDs in sequence from PE8 to PE15, and resets the sequence after all LEDs are lit.
+**Purpose:** Handles LED sequencing, turning on LEDs in sequence from PE8 to PE15, and resets the sequence after all LEDs are lit.  
 **Inputs**: None  
 **Outputs**: None  
 **Testing**:
 - Call the function 8 times and visually verify that each LED turns on in sequence
 - Call the function a 9th time and verify all LEDs turn off (sequence resets)
 
-`enable_timer()`  
+---
+### `enable_timer()`  
 ```c
 void enable_timer(void) {
     // Enable the Timer 2 counter
     TIM2->CR1 |= TIM_CR1_CEN;
 }
 ```
-**Purpose:**Enables the Timer 2 counter to start the timer operation.
+**Purpose:** Enables the Timer 2 counter to start the timer operation.  
 **Inputs:** None  
 **Outputs:** None  
 **Testing:** After calling this function, verify that TIM2->CR1 has the CEN bit set.  
 
-`set_new_period(uint32_t new_value)`  
+---
+### `set_new_period(uint32_t new_value)`  
 ```c
 void set_new_period(uint32_t new_value){
 
@@ -588,7 +846,8 @@ void set_new_period(uint32_t new_value){
 - Verify the timer stops and restarts by checking TIM2->CR1 CEN bit during execution
 - Verify TIM2->CNT is reset to 0
 
-`GPIO_Button_Init()`  
+---
+### `GPIO_Button_Init()`  
 ```c
 void GPIO_Button_Init(void)
 {
@@ -623,7 +882,8 @@ void GPIO_Button_Init(void)
 - Verify SYSCFG->EXTICR[0] has PA0 configured as interrupt source
 - Press the button and verify the button_pressed flag is set in the interrupt handler
 
-`one_shot_trigger(uint32_t delay, callback_t cb)`  
+---
+### `one_shot_trigger(uint32_t delay, callback_t cb)`  
 ```c
 void one_shot_trigger(uint32_t  delay_ms, callback_t cb_c) {
     // Store the callback function for later use
@@ -683,8 +943,8 @@ void one_shot_trigger(uint32_t  delay_ms, callback_t cb_c) {
 - Verify Timer 2 stops after the callback (one-pulse mode)
 - Verify TIM2->CR1 has the OPM bit set for one-pulse mode
 
-
-`flash_led()`  
+---
+### `flash_led()`  
 ```c
 void flash_led(void) {
 
@@ -702,7 +962,7 @@ void flash_led(void) {
 **Outputs:** None  
 **Testing:** Call the function and visually verify all LEDs turn off and LED1 (PE9) turns on.  
 
-
+---
 
 ![Timers Diagram](diagrams/timers.drawio.png)
 
