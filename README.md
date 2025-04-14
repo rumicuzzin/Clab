@@ -17,7 +17,7 @@
 - [Team Members](#team-members)
 - [Exercise 1: Digital I/O](#exercise-1-digital-io)
   - [Part a) Basic Functionality](#part-a-basic-functionality)
-  - [Part b)](#part-b)
+  - [Part b)](#part-b) 
   - [Part c)](#part-c)
   - [Part d) Advanced Functionality](#part-d-advanced-functionality)
   - [Discussion Points](#discussion-points)
@@ -89,6 +89,53 @@ Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with
 
 #### `USART1_EXTI25_IRQHandler()`
 
+```c
+void USART1_EXTI25_IRQHandler() {
+    // Check for overrun or frame errors
+    if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk)) {
+        return;
+    }
+
+    // Store the read data in active buffer if there's space
+    if (*activeBufferSize < BUFFER) {
+        activeBuffer[*activeBufferSize] = data;
+        (*activeBufferSize)++;
+    }
+
+    // Toggle LEDs to indicate char received
+    // Note: probably not needed
+    if (data == ter_char) {
+        uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+        *lights = !(*lights);
+    }
+
+    // Switch to the other buffer and process the now-inactive buffer
+    if (activeBufferNum == 1) {
+        // Parse active buffer contents and size
+        rx_complete_callback(buffer1, buffer1Size);
+
+        // Switch active buffer to buffer2
+        activeBuffer = buffer2;
+        activeBufferSize = &buffer2Size;
+        activeBufferNum = 2;
+    } else {
+        // Process the buffer we're switching from
+        rx_complete_callback(buffer2, buffer2Size);
+
+        // Switch active buffer to buffer1
+        activeBuffer = buffer1;
+        activeBufferSize = &buffer1Size;
+        activeBufferNum = 1;
+    }
+
+    // Reset the size for the new active buffer
+    // Note: need to be able to reset the buffer too
+    *activeBufferSize = 0;
+    memset(activeBuffer, 0, BUFFER);
+}
+```
+
+
 **Purpose:**  
 Interrupt Service Routine for USART1 — handles incoming characters, detects terminator, manages double-buffering, and triggers the parsing callback.
 
@@ -99,9 +146,23 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 - *None (void function)*  
   Processes buffers and calls `rx_complete_callback()` internally.
 
+**Double Buffer Functionality:**
+
+
 ---
 
 #### `SerialOutputString()`
+```c
+void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
+	uint32_t counter = 0;
+	while(*pt) {
+		SerialOutputChar(*pt, serial_port);
+		counter++;
+		pt++;
+	}
+	serial_port->completion_function(counter);
+}
+```
 
 **Purpose:**  
 Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
