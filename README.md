@@ -3,7 +3,6 @@
 ## Project Overview
 
 ---
-
 ## Team Members
 
 - **Will Rumi** - Exercise 3: Timers
@@ -11,24 +10,29 @@
 - **James Blisset** - Exercise 2: Serial
 - **Marcus** - Exercise 1: Digital I/O
 
-## Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+## Exercise 1: Digital I/O
+Details and explanation for Exercise 1, Digital I/O.
 
+## Exercise 2: Serial Interface
+Details and explanation for Exercise 2, Serial Interface.
 
-Exercise 1: Digital I/O
+## Exercise 3: Timer Interface
+Details and explanation for Exercise 3, Timer Interface.
 
+## Exercise 4: Integration Task
+Details and explanation for Exercise 4, Integration Task.
 
-Exercise 2: Serial Interface
+## Installation
+Instructions for setting up the project locally.
 
+## Usage
+How to use the project after installation.
 
-Exercise 3: Timer Interface
+## Contributing
+How to contribute to the project.
 
+## License
+Information on the project's license.
 
-Exercise 4: Integration Task 
-
-
----
+## Acknowledgements
+Credit to libraries, tools, or individuals that helped with the project.
