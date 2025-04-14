@@ -69,8 +69,9 @@
 - **Command Framework**: Buffered input system with `processBuffer` callback
 - **Dual-buffer receive system**: With interrupt handling and buffer switching
 
-```c
+
 #### `SerialInitialise()`
+```c
 void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, char terminator, void (*rx_parsing)(unsigned char*, int)) {
 
 	rx_complete_callback = rx_parsing;
