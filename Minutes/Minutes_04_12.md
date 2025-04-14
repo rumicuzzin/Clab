@@ -1,6 +1,6 @@
 MEETING MINUTES WEEK 7
 
-DATE: Tuesday, 12/04/2025 
+DATE: Saturday, 12/04/2025 
 TIME: 4pm - 8pm
 LOCATION: PNR / Online
 
