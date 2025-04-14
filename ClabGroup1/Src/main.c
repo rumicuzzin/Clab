@@ -18,7 +18,6 @@
 
  #include <stdint.h>
  #include "stm32f303xc.h"
-
  #include "serial.h"
 
  #if !defined(__SOFT_FP__) && defined(__ARM_FP)
@@ -33,35 +32,11 @@
 
  void enableLEDs();
 
- void finished_transmission(uint32_t bytes_sent) {
-     // This function will be called after a transmission is complete
-
-     volatile uint32_t test = 0;
-     // make a very simple delay
-     for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
-         // waste time !
-     }
- }
-
- void a_placeholder(uint32_t bytes_sent) {
-     // This function will be called after a transmission is complete
-
-     volatile uint32_t test = 0;
-     // make a very simple delay
-     for (volatile uint32_t i = 0; i < 0x8ffff; i++) {
-         // waste time !
-     }
- }
-
  int main(void)
  {
-
      uint8_t *string_to_send = "Sally is a beautiful dog!\r\n";
-
-     //void (*completion_function)(uint32_t) = &finished_transmission;
-
-     SerialInitialise(BAUD_115200, &USART1_PORT, &finished_transmission,&a_placeholder);
-     USART1RX_enableInterrupts('$');
+     SerialInitialise(BAUD_115200, &USART1_PORT, '$',&processBuffer);
+     USART1RX_enableInterrupts();
      enableLEDs();
 
      // Loop forever
@@ -72,6 +47,31 @@
      }
  }
 
+ // Function to process buffer contents - always processes the inactive buffer
+ void processBuffer(unsigned char* buffer, int size)
+ {
+     // This function processes the inactive buffer while the other buffer is collecting data
+     // Currently just a placeholder - you can implement your specific logic here
+
+
+     /*
+      * Example of what you might want to do with the buffer:
+      *
+      * - Parse commands
+      * - Convert ASCII to values
+      * - Forward to another device
+      * - Store in non-volatile memory
+      * - Perform calculations based on buffer contents
+      */
+
+
+     // For demonstration purposes, send a message indicating buffer processing
+     USART1_SendString("Processing inactive buffer...");
+
+
+     // Here you would actually process the buffer contents
+     // This processing happens while the other buffer is now active and collecting data
+ }
 
  void enableLEDs()
  {

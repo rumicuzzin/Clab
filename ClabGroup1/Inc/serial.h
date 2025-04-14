@@ -27,8 +27,8 @@ enum {
  
 // SerialInitialise - initialise the serial port
 // Input: baud rate as defined in the enum
-void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*completion_function)(uint32_t), void (*rx_complete_callback)(unsigned char*, int));
- 
+void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, char terminator, void (*rx_parsing)(unsigned char*, int));
+
 
 // SerialOutputChar - output a char to the serial port
 //  note: this version waits until the port is ready (not using interrupts)
@@ -42,7 +42,7 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port);
  
 // Enable interrupts
 // Need to have input and output for this function - passes in what the user defined terminating character should be
-void USART1RX_enableInterrupts(char terminator);
+void USART1RX_enableInterrupts();
 
 // Defining what happens when interrupt called
 // Need to have input and output for this function

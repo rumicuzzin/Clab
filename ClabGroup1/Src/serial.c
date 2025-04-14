@@ -16,25 +16,7 @@ struct _SerialPort {
 	volatile uint32_t SerialPinAlternatePinValueLow;
 	volatile uint32_t SerialPinAlternatePinValueHigh;
 
-	//TX completion callback function
-	void (*completion_function)(uint32_t);
-	//RX completion callback function
-	void (*rx_complete_callback)(unsigned char *incoming_buff, int incoming_counter)
-
 };
-
-// Buffer to store incoming characters
-#define BUFFER 256
-
-// Defining the user terminated character variable
-signed char ter_char;
-// Initialising the buffer
-unsigned char string[BUFFER];
-int i = 0;
-
-// defining receive callback function
-//void(*receive_callback)(*str_pointer, char_count);
-
 // instantiate the serial port parameters
 //   note: the complexity is hidden in the c file
 SerialPort USART1_PORT = {USART1,
@@ -49,13 +31,82 @@ SerialPort USART1_PORT = {USART1,
 		0x00 // default function pointer is NULL
 		};
 
+// Buffer to store incoming characters
+#define BUFFER 256
+//RX completion callback function
+void (*rx_complete_callback)(unsigned char *incoming_buff, int incoming_counter);
+//TX completion callback function
+//void (*completion_function)(uint32_t);
+
+
+// Two buffers to store incoming characters
+unsigned char buffer1[BUFFER];
+unsigned char buffer2[BUFFER];
+
+// Variable for keeping track of content sizes
+int buffer1Size = 0;
+int buffer2Size = 0;
+
+// User terminated character variable
+signed char ter_char;
+int activeBufferNum = 1; // 1 for buffer1, 2 for buffer2
+
+// Pointer to initialise the active buffer and its size
+unsigned char* activeBuffer = buffer1;
+int* activeBufferSize = &buffer1Size;
+
+void USART1_EXTI25_IRQHandler() {
+	// Check for overrun or frame errors
+	if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk)) {
+		return;
+	}
+
+	// Store the read data in active buffer if there's space
+	if (*activeBufferSize < BUFFER) {
+		activeBuffer[*activeBufferSize] = data;
+		(*activeBufferSize)++;
+	}
+
+	// Toggle LEDs to indicate char received
+	// Note: probably not needed
+	if (data == ter_char) {
+		uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+		*lights = !(*lights);
+	}
+
+	// Switch to the other buffer and process the now-inactive buffer
+	if (activeBufferNum == 1) {
+
+		// Parse active buffer contents and size
+		rx_complete_callback(buffer1, buffer1Size);
+
+		// Switch active buffer to buffer2
+		activeBuffer = buffer2;
+		activeBufferSize = &buffer2Size;
+		activeBufferNum = 2;
+	} else {
+		// Process the buffer we're switching from
+		rx_complete_callback(buffer2, buffer2Size);
+
+		// Switch active buffer to buffer1
+		activeBuffer = buffer1;
+		activeBufferSize = &buffer1Size;
+		activeBufferNum = 1;
+	}
+
+	// Reset the size for the new active buffer
+	// Note: need to be able to reset the buffer too
+	*activeBufferSize = 0;
+	memset(activeBuffer, 0, BUFFER);
+
+
+}
 
 // InitialiseSerial - Initialise the serial port
 // Input: baudRate is from an enumerated set
-void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*completion_function)(uint32_t), void (*rx_complete_callback)(unsigned char*, int)) {
+void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, char terminator, void (*rx_parsing)(unsigned char*, int)) {
 
-	serial_port->completion_function = completion_function;
-	serial_port->rx_complete_callback = rx_complete_callback;
+	rx_complete_callback = rx_parsing;
 
 	// enable clock power, system configuration clock and GPIOC
 	// common to all UARTs
@@ -105,81 +156,37 @@ void SerialInitialise(uint32_t baudRate, SerialPort *serial_port, void (*complet
 		break;
 	}
 
-
 	// enable serial port for tx and rx
 	serial_port->UART->CR1 |= USART_CR1_TE | USART_CR1_RE | USART_CR1_UE;
+
+	//Defining the user defined terminating character on initialisation
+	ter_char = terminator;
 }
 
-
 void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
-
 	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
 	}
-
 	serial_port->UART->TDR = data;
 }
 
-
 void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
-
 	uint32_t counter = 0;
 	while(*pt) {
 		SerialOutputChar(*pt, serial_port);
 		counter++;
 		pt++;
 	}
-
 	serial_port->completion_function(counter);
 }
 
-void USART1RX_enableInterrupts(char terminator)
-{
+void USART1RX_enableInterrupts() {
 	__disable_irq();
+	// Generate an interrupt upon receiving data
+	USART1->CR1 |= USART_CR1_RXNEIE_Msk;
 
-		// Generate an interrupt upon receiving data
-		USART1->CR1 |= USART_CR1_RXNEIE_Msk;
+	// Set priority and enable interrupts
+	NVIC_SetPriority(USART1_IRQn, 1);
+	NVIC_EnableIRQ(USART1_IRQn);
 
-		// Set priority and enable interrupts
-		NVIC_SetPriority(USART1_IRQn, 1);
-		NVIC_EnableIRQ(USART1_IRQn);
-
-		__enable_irq();
-
-		//Defining the user defined terminating character on initialisation
-		ter_char = terminator;
-}
-
-void USART1_EXTI25_IRQHandler()
-{
-	// Check for overrun or frame errors
-	if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk))
-	{
-		return;
-	}
-
-	// If we have stored the maximum amount, stop
-	if (i == BUFFER)
-	{
-		return;
-	}
-
-	if (USART1->ISR & USART_ISR_RXNE_Msk)
-	{
-		// Read data
-		unsigned char data = (uint8_t) USART1->RDR;
-
-		// Store the read data
-		string[i] = data;
-		i++;
-
-		// Indicate that terminating character is received
-		if (data == ter_char){
-			SerialOutputString("Terminating Char Received", &USART1_PORT);
-
-		}
-
-		// Toggle LEDs
-		uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
-		*lights = !(*lights);
-	}
+	__enable_irq();
 }
