@@ -3,12 +3,6 @@
 ## Project Overview
 
 ---
-## Team Members
-
-- **Will Rumi** - Exercise 3: Timers
-- **Audrey** - Exercise 2: Serial
-- **James Blisset** - Exercise 2: Serial
-- **Marcus** - Exercise 1: Digital I/O
 
   ## Table of Contents
 - [Team Members](#team-members)
@@ -22,6 +16,11 @@
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
+## Team Members
+- **Will Rumi** - Exercise 3: Timers
+- **Audrey** - Exercise 2: Serial
+- **James Blisset** - Exercise 2: Serial
+- **Marcus** - Exercise 1: Digital I/O
 
 ## Exercise 1: Digital I/O
 Details and explanation for Exercise 1, Digital I/O.
