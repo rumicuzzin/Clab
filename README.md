@@ -6,9 +6,9 @@
 
 ## Team Members
 - **Will Rumi** - Exercise 3: Timers  
-- **Audrey** - Exercise 2: Serial  
+- **Audrey Soo** - Exercise 2: Serial  
 - **James Blisset** - Exercise 2: Serial  
-- **Marcus** - Exercise 1: Digital I/O
+- **Marcus Kurishingal** - Exercise 1: Digital I/O
 
 ---
 
@@ -43,7 +43,14 @@
 ## Exercise 1: Digital I/O
 
 ### Part a) Basic Functionality
+The Digital I/O module provides a simple interface for controlling the LEDs on the STM32F3 Discovery board and reading the state of the user button. This implementation covers the basic requirements for digital I/O control.
+Key Features:
 
+- **LED Control**: Interface to control the 8 LEDs (PE8-PE15) individually
+- **Button Reading**: Detection of user button (PA0) state
+- **Hardware Abstraction**: Encapsulation of register access and bit manipulation
+
+  
 ### Part b)
 
 ### Part c)
