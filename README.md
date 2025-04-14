@@ -28,9 +28,9 @@
   - [Part d) Advanced Functionality](#part-d-advanced-functionality-1)
   - [Discussion Points](#discussion-points-1)
 - [Exercise 3: Timer Interface](#exercise-3-timer-interface)
-  - [Part a) Basic Functionality](#part-a-basic-functionality-2)
-  - [Part b)](#part-b-2)
-  - [Part c) Advanced Functionality](#part-c-advanced-functionality)
+  - [Overview](#overview)
+  - [Functions)](#Functions)
+  - [Limitations)](#Limitations)
   - [Discussion Points](#discussion-points-2)
 - [Exercise 4: Integration Task](#exercise-4-integration-task)
   - [Discussion Points](#discussion-points-3)
@@ -706,7 +706,7 @@ void flash_led(void) {
 
 ![Timers Diagram](diagrams/timers.drawio.png)
 
-### Limitations
+### Limitations ###
 - Single timer usage (Timer 2 only)
 - Potential timer conflicts between periodic and one-shot operations
 - Callback execution constraints within interrupt context
