@@ -68,6 +68,15 @@ Key Features:
 ## Exercise 2: Serial Interface
 
 ### Part a) Basic Functionality
+Uses polling to handle UART transmission and reception while monitoring for a terminator character. 
+
+#### Features: 
+- **Periodic transmission**: Of a predefined string message
+- **LED toggle**: When terminator character is received
+- Echo of **received buffer contents** after terminator detection
+
+Other functions used:
+`enableUSART1()`, `enableLEDs()`
 
 ### Part b)
 #### `processBuffer()`
