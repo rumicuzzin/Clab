@@ -97,21 +97,17 @@ oid DigitalIO_Init(ButtonCallback callback) {
 
 ```
 
-**Purpose:**  
-Initialises the DIO module with button callback functionality  
+**Purpose:** Initialises the DIO module with button callback functionality  
 - Enables clock for GPIOA (button) and GPIOE (LEDs)  
 - Configures PE8–PE15 (LEDs) as outputs  
 - Configures button interrupt on PA0  
 - Stores the provided callback function  
 
-**Input:**  
-`callback`: Function pointer to be called when button is pressed  
+**Input:** `callback`: Function pointer to be called when button is pressed  
 
-**Output:**  
-None  
+**Output:** None  
 
-**Testing:**  
-Initialise with a callback function and verify it gets called when button is pressed    
+**Testing:** Initialise with a callback function and verify it gets called when button is pressed    
 
 #### `DigitalIO_SetLED(uint8_t ledNumber, uint8_t state)`
 ```c
@@ -129,8 +125,7 @@ void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
         *led_register &= ~(1 << ledNumber); // Clear bit
 }
 ```
-**Purpose:**  
-Sets the state of a specific LED  
+**Purpose:** Sets the state of a specific LED  
 - Controls a single LED based on the LED number (0–7, corresponding to LD3–LD10)  
 - `state` determines whether to turn on (non-zero) or off (zero) the LED  
 
@@ -138,11 +133,9 @@ Sets the state of a specific LED
 - `ledNumber`: LED number (0–7)  
 - `state`: 0 to turn off, non-zero to turn on  
 
-**Output:**  
-None  
+**Output:** None  
 
-**Testing:**  
-Turn each LED on and off individually and verify visually  
+**Testing:** Turn each LED on and off individually and verify visually  
 
 ---
 `DigitalIO_ReadButton_a()`
