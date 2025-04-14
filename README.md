@@ -171,7 +171,10 @@ void processBuffer(unsigned char* buffer, int size);
 	parseCommand(buffer);
  }
 ```
+**Purpose:** Callback
+- Process Asynchronous Communications
 
+- gets triggered when the UART reception system has collected a complete set of data
 
 ### Part c)
 
