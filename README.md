@@ -88,16 +88,6 @@ void processBuffer(unsigned char* buffer, int size);
  }
 ```
 
-**Purpose:**  
-Custom user-defined callback to process a fully received buffer (inactive buffer after terminator character).
-
-**Input:**
-- `unsigned char *buffer` — Pointer to the buffer that contains received characters
-- `int size` — Number of bytes in the buffer
-
-**Output:**
-- *None (void function)*  
-  You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
 
 ### Part c)
 
@@ -276,8 +266,17 @@ Transmits a **null-terminated string** over USART1 using blocking (polling) tran
 
 ---
 
-Part b)
 #### `processBuffer()`
+**Purpose:**  
+Custom user-defined callback (part b) to process a fully received buffer (inactive buffer after terminator character).
+
+**Input:**
+- `unsigned char *buffer` — Pointer to the buffer that contains received characters
+- `int size` — Number of bytes in the buffer
+
+**Output:**
+- *None (void function)*  
+  You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
 
 
 
