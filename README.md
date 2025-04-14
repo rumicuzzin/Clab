@@ -799,7 +799,7 @@ void set_led(void) {
     current_led++;
 }
 ```
-**Purpose:** Handles LED sequencing, turning on LEDs in sequence from PE8 to PE15, and resets the sequence after all LEDs are lit.
+**Purpose:** Handles LED sequencing, turning on LEDs in sequence from PE8 to PE15, and resets the sequence after all LEDs are lit.  
 **Inputs**: None  
 **Outputs**: None  
 **Testing**:
@@ -814,7 +814,7 @@ void enable_timer(void) {
     TIM2->CR1 |= TIM_CR1_CEN;
 }
 ```
-**Purpose:**Enables the Timer 2 counter to start the timer operation.
+**Purpose:** Enables the Timer 2 counter to start the timer operation.  
 **Inputs:** None  
 **Outputs:** None  
 **Testing:** After calling this function, verify that TIM2->CR1 has the CEN bit set.  
