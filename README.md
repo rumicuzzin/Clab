@@ -63,13 +63,12 @@
 ### Part c)
 
 ### Part d) Advanced Functionality
-Features: 
+### Features: 
 - **Serial Communication**: 115200 baud UART with interrupt-driven RX
 - **LED Control**: GPIO interface for 8 LEDs (Port E)
 - **Command Framework**: Buffered input system with `processBuffer` callback
 - **Dual-buffer receive system**: With interrupt handling and buffer switching
 
-## 🔄 Function Inputs and Outputs
 
 ### `SerialInitialise()`
 
