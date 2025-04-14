@@ -10,11 +10,11 @@
 #include "stm32f303xc.h"
 
 /**
- * @brief Initialize the Digital I/O module (Part A)
+ * @brief Initialize the Digital I/O module
  *
  * Configures the LEDs (PE8-PE15) and the User button (PA0)
  */
-void DigitalIO_Init(void);
+void DigitalIO_Init_a(void);
 
 /**
  * @brief Set the state of a specific LED
@@ -24,25 +24,14 @@ void DigitalIO_Init(void);
  */
 void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state);
 
-/**
- * @brief Set all LEDs according to a pattern
- *
- * @param pattern 8-bit pattern where each bit represents an LED
- */
-void DigitalIO_SetLEDPattern(uint8_t pattern);
 
 /**
  * @brief Read the current state of the user button
  *
  * @return 1 if button is pressed, 0 if not pressed
  */
-uint8_t DigitalIO_ReadButton(void);
+uint8_t DigitalIO_ReadButton_a(void);
 
-/**
- * @brief Run the button polling loop for Part A demo
- *
- * Continuously polls the button and updates LEDs
- */
-void DigitalIO_RunButtonPoll(void);
+int main_a(void);
 
 #endif /* DIGITAL_IO_A_H */

@@ -6,19 +6,28 @@
 #ifndef DIGITAL_IO_B_H
 #define DIGITAL_IO_B_H
 
-#include "digital_io_a.h"
+#include <stdint.h>
+#include "stm32f303xc.h"
 
 /**
  * @brief Function pointer type for button callback
+ *
+ * This function is called when the user button is pressed
  */
 typedef void (*ButtonCallback)(void);
 
+// Get function
+uint8_t get_led_state();
+// Set function
+void set_led_state(uint8_t new_val);
 /**
- * @brief Initialize the Digital I/O module with button callback (Part B)
+ * @brief Initialize the Digital I/O module
+ *
+ * Configures the LEDs (PE8-PE15) and the User button (PA0) with interrupt
  *
  * @param callback Function to call when button is pressed (can be NULL)
  */
-void DigitalIO_InitWithCallback(ButtonCallback callback);
+void DigitalIO_Init(ButtonCallback callback);
 
 /**
  * @brief Set the button press callback function
@@ -27,12 +36,11 @@ void DigitalIO_InitWithCallback(ButtonCallback callback);
  */
 void DigitalIO_SetButtonCallback(ButtonCallback callback);
 
-/**
- * @brief Move to the next LED in sequence
- *
- * This function turns off the current LED, advances to the next one,
- * and turns it on.
- */
-void DigitalIO_MoveLedForward(void);
+
+// Function that gets passed on interupt
+void next_led(void);
+
+// Main function
+void main_b(void);
 
 #endif /* DIGITAL_IO_B_H */

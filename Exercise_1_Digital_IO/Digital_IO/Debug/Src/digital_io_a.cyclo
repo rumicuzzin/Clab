@@ -1,5 +1,4 @@
-../Src/digital_io_a.c:6:6:DigitalIO_Init	1
-../Src/digital_io_a.c:27:6:DigitalIO_SetLED	3
-../Src/digital_io_a.c:44:6:DigitalIO_SetLEDPattern	1
-../Src/digital_io_a.c:53:9:DigitalIO_ReadButton	1
-../Src/digital_io_a.c:61:6:DigitalIO_RunButtonPoll	5
+../Src/digital_io_a.c:13:6:DigitalIO_Init_a	1
+../Src/digital_io_a.c:39:6:DigitalIO_SetLED	3
+../Src/digital_io_a.c:59:9:DigitalIO_ReadButton_a	1
+../Src/digital_io_a.c:66:5:main_a	5
