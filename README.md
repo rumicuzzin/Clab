@@ -113,7 +113,7 @@ None
 **Testing:**  
 Initialise with a callback function and verify it gets called when button is pressed    
 
-`DigitalIO_SetLED(uint8_t ledNumber, uint8_t state)`
+#### `DigitalIO_SetLED(uint8_t ledNumber, uint8_t state)`
 ```c
 void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
     // Validate LED number (0-7)
@@ -129,16 +129,22 @@ void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
         *led_register &= ~(1 << ledNumber); // Clear bit
 }
 ```
-**Purpose:** Sets the state of a specific LED
-- Controls a single LED based on the LED number (0-7 corresponding to LD3-LD10)
-- State parameter determines whether to turn on (non-zero) or off (zero) the LED
+**Purpose:**  
+Sets the state of a specific LED  
+- Controls a single LED based on the LED number (0–7, corresponding to LD3–LD10)  
+- `state` determines whether to turn on (non-zero) or off (zero) the LED  
 
-**Input:**
-- `ledNumber`: LED number (0-7) corresponding to LD3-LD10
-- `state`: 0 to turn off, non-zero to turn on
-**Output:** None  
-**Testing:** Turn each LED on and off individually and verify visually  
+**Input:**  
+- `ledNumber`: LED number (0–7)  
+- `state`: 0 to turn off, non-zero to turn on  
 
+**Output:**  
+None  
+
+**Testing:**  
+Turn each LED on and off individually and verify visually  
+
+---
 `DigitalIO_ReadButton_a()`
 ```c
 uint8_t DigitalIO_ReadButton_a(void) {
