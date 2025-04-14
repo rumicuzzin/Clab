@@ -706,7 +706,15 @@ void flash_led(void) {
 
 ![Timers Diagram](diagrams/timers.drawio.png)
 
-### Discussion Points
+### Limitations
+- Single timer usage (Timer 2 only)
+- Potential timer conflicts between periodic and one-shot operations
+- Callback execution constraints within interrupt context
+- Issues with global variables for state management
+- Fixed clock configuration assumptions
+- Lack of timer overflow handling
+- Limited error handling
+- No button debouncing
 
 ---
 
