@@ -38,4 +38,11 @@ void DigitalIO_SetLEDPattern(uint8_t pattern);
  */
 uint8_t DigitalIO_ReadButton(void);
 
+/**
+ * @brief Run the button polling loop for Part A demo
+ *
+ * Continuously polls the button and updates LEDs
+ */
+void DigitalIO_RunButtonPoll(void);
+
 #endif /* DIGITAL_IO_A_H */

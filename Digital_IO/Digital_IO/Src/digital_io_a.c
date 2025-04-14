@@ -1,4 +1,3 @@
-
 #include "digital_io_a.h"
 
 /**
@@ -13,7 +12,6 @@ void DigitalIO_Init(void) {
     *led_output_registers = 0x5555; // Set as outputs (01 pattern for each pin)
 
     // Configure PA0 (User button) as input (default state)
-
     // Configure with pull-down (button connects to VDD when pressed)
     GPIOA->PUPDR &= ~(0x3);
     GPIOA->PUPDR |= 0x2; // Pull-down (10 pattern)
@@ -35,7 +33,7 @@ void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
     uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
 
     if (state)
-        *led_register |= (1 << ledNumber);  // Set bit
+        *led_register |= (1 << ledNumber); // Set bit
     else
         *led_register &= ~(1 << ledNumber); // Clear bit
 }
@@ -55,4 +53,37 @@ void DigitalIO_SetLEDPattern(uint8_t pattern) {
 uint8_t DigitalIO_ReadButton(void) {
     // Read button state from PA0
     return (GPIOA->IDR & GPIO_IDR_0) ? 1 : 0;
+}
+
+/**
+ * @brief Run the button polling loop for Part A demo
+ */
+void DigitalIO_RunButtonPoll(void) {
+    uint8_t current_led = 0;
+
+    /* Loop forever */
+    for(;;) {
+        // Check if button is pressed
+        if (DigitalIO_ReadButton()) {
+            // When button is pressed, move to next LED
+
+            // Turn off current LED
+            DigitalIO_SetLED(current_led, 0);
+
+            // Move to next LED (0-7 representing LD3-LD10)
+            current_led = (current_led + 1) % 8;
+
+            // Turn on new current LED
+            DigitalIO_SetLED(current_led, 1);
+
+            // Simple debounce delay
+            for(volatile uint32_t i = 0; i < 300000; i++);
+
+            // Wait for button release
+            while(DigitalIO_ReadButton());
+
+            // Additional debounce delay after release
+            for(volatile uint32_t i = 0; i < 100000; i++);
+        }
+    }
 }

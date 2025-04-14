@@ -10,6 +10,9 @@
 ButtonCallback g_buttonCallback = NULL; // Button press callback function
 volatile uint8_t g_part_b_active = 0; // Flag to indicate if Part B is active
 
+/* LED state variable - available for all parts */
+static uint8_t current_led = 0;
+
 /**
  * @brief Initialize the Digital I/O module with callback
  */
@@ -53,4 +56,16 @@ void DigitalIO_SetButtonCallback(ButtonCallback callback) {
     g_buttonCallback = callback;
 }
 
-/* Interrupt handler is in IRQHandler.c */
+/**
+ * @brief Move to the next LED in sequence
+ */
+void DigitalIO_MoveLedForward(void) {
+    // Turn off current LED
+    DigitalIO_SetLED(current_led, 0);
+
+    // Move to next LED
+    current_led = (current_led + 1) % 8;
+
+    // Turn on new current LED
+    DigitalIO_SetLED(current_led, 1);
+}

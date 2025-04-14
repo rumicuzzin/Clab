@@ -1,68 +1,45 @@
-// digital_io_d.c
 #include "digital_io_d.h"
 #include "stm32f303xc.h"
+#include <stddef.h>
 
-// Global variable for LED control
-static uint8_t current_led = 0;
+/* Global variables */
+static LedState_t led_move = LED_IDLE; // Current LED movement state
+static uint8_t current_led = 0; // Track which LED is currently lit
 
-// Global flag to indicate button press
-static volatile uint8_t button_was_pressed = 0;
+void next_led(void) {
+    // Turn off current LED
+    DigitalIO_SetLED(current_led, 0);
 
-// Button callback function - sets flag and returns immediately
-void delay_button_callback(void) {
-    // Just set a flag and return immediately
-    button_was_pressed = 1;
+    // Move to next LED
+    current_led = (current_led + 1) % 8;
 
-    // Visual indication that button press was detected
-    uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
-    uint8_t saved_state = *led_register;
-    *led_register = 0xFF; // All on
-    for(volatile uint32_t i = 0; i < 100000; i++); // Brief delay
-    *led_register = saved_state; // Restore original state
+    // Turn on new current LED
+    DigitalIO_SetLED(current_led, 1);
 }
 
-// Timer interrupt handler
+
+void delay_button_callback(void) {
+
+    // If there is no pending move, request one
+    if (led_move == LED_IDLE) {
+        led_move = LED_MOVE_PENDING;
+    }
+}
+
+
 void TIM2_IRQHandler(void) {
     // Clear interrupt flag
     TIM2->SR &= ~TIM_SR_UIF;
 
-    // Debug - Toggle LED 7 to indicate timer tick
-    static uint8_t toggle_state = 0;
-    toggle_state = !toggle_state;
-
-    // Check for button press or automatic timing
-    static int auto_counter = 0;
-    uint8_t move_led = 0;  // Using uint8_t instead of bool
-
-    // If button was pressed, move LED immediately and reset auto counter
-    if (button_was_pressed) {
-        button_was_pressed = 0;
-        move_led = 1;  // Using 1 instead of true
-        auto_counter = 0;  // Reset automatic counter
-    }
-    // Otherwise, check if it's time for automatic movement
-    else if (++auto_counter >= 3) {
-        move_led = 1;  // Using 1 instead of true
-        auto_counter = 0;
-    }
-
-    // If we need to move the LED (from either source)
-    if (move_led) {
-        // Turn off current LED
-        DigitalIO_SetLED(current_led, 0);
-
-        // Move to next LED
-        current_led = (current_led + 1) % 8;
-
-        // Turn on new LED
-        DigitalIO_SetLED(current_led, 1);
+    // Check if a button press has requested LED movement
+    if (led_move == LED_MOVE_PENDING) {
+        // Execute LED movement
+        next_led();
+        led_move = LED_IDLE;
     }
 }
 
-// Initialize the timer delay mechanism
 void DigitalIO_InitDelay(uint16_t delay_ms) {
-
-
     // Enable clock for TIM2
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
@@ -82,7 +59,6 @@ void DigitalIO_InitDelay(uint16_t delay_ms) {
     current_led = 0;
 }
 
-// Enable or disable the delay mechanism
 void DigitalIO_SetDelay(int enable) {
     if (enable) {
         // Enable counter

@@ -1,9 +1,8 @@
-// digital_io_d.h
 #ifndef DIGITAL_IO_D_H
 #define DIGITAL_IO_D_H
 
-#include "digital_io_a.h"
-#include "digital_io_b.h"
+#include "digital_io_c.h"
+#include <stdint.h>
 
 // LED states for the delay mechanism
 typedef enum {
@@ -13,6 +12,9 @@ typedef enum {
 
 // Button callback for delayed LED movement
 void delay_button_callback(void);
+
+// Function to move to next LED in the sequence
+void next_led(void);
 
 // Initialize the timer for delayed LED movement
 void DigitalIO_InitDelay(uint16_t delay_ms);

@@ -1,8 +1,6 @@
 /**
  * @file digital_io_c.h
  * @brief Digital I/O interface with encapsulated LED state (Part C)
- *
- * Builds on parts A and B by adding LED state encapsulation with getters
  */
 
 #ifndef DIGITAL_IO_C_H
@@ -11,11 +9,11 @@
 #include "digital_io_b.h"
 
 /**
- * @brief Initialize with callback and state tracking (Part C)
+ * @brief Initialize with state tracking (Part C)
  *
- * @param callback Function to call when button is pressed
+ * Sets up callbacks and state tracking internally
  */
-void DigitalIO_InitStateTracking(ButtonCallback callback);
+void DigitalIO_InitStateTracking(void);
 
 /**
  * @brief Set the state of a specific LED with state tracking (Part C)
@@ -46,5 +44,12 @@ uint8_t DigitalIO_GetLEDState(uint8_t ledNumber);
  * @return 8-bit pattern representing the state of all LEDs
  */
 uint8_t DigitalIO_GetLEDPattern(void);
+
+/**
+ * @brief Run the LED monitoring demo for Part C
+ *
+ * Demonstrates state tracking and getter functions
+ */
+void DigitalIO_RunMonitoringDemo(void);
 
 #endif /* DIGITAL_IO_C_H */
