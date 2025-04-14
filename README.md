@@ -1,4 +1,4 @@
-# Clab MTRX2700 C Lab for STM32F3 Discovery Board
+# MTRX2700 C Lab for STM32F3Discovery Board
 
 ## Project Overview
 
