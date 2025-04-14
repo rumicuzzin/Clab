@@ -1,8 +1,8 @@
 MEETING MINUTES WEEK 7
 
 DATE: Tuesday, 12/04/2025 
-
-TIME: 4pm - 5pm
+TIME: 4pm - 8pm
+LOCATION: PNR / Online
 
 ATTENDEES: 
 - Marcus Kurishingal
@@ -14,13 +14,16 @@ APOLOGIES: Willem Rumi
 ABSENCES: None
 
 OLD BUSINESS: 
-- Finish all exercises
+- Progress on assigned tasks continued
+- Willem completed timers and is assisting in Digital IO and UART
 
 NEW BUSINESS:
-- begin integration tasks
+- Completeing part D for Digital IO and UART
+- begin preliminary testing between modules
+- 
 
 FURTHER ACTION POINTS:
-- 
+- aiming to have full integration by next meeting
 
 MEETING MINTUES WRITTEN BY: Marcus Kurishingal 
 
