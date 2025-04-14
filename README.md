@@ -27,7 +27,7 @@
   - [Discussion Points](#discussion-points-1)
 - [Exercise 3: Timer Interface](#exercise-3-timer-interface)
   - [Overview](#overview)
-  - [Functions)](#Functions)
+  - [Functions](#Functions)
   - [Limitations)](#Limitations)
   - [Discussion Points](#discussion-points-2)
 - [Exercise 4: Integration Task](#exercise-4-integration-task)
