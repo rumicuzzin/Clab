@@ -53,6 +53,8 @@ Key Features:
   
 ### Part b)
 
+
+
 ### Part c)
 
 ### Part d) Advanced Functionality
@@ -68,6 +70,34 @@ Key Features:
 ### Part a) Basic Functionality
 
 ### Part b)
+#### `processBuffer()`
+
+```c
+void processBuffer(unsigned char* buffer, int size);
+
+ // Function to process buffer contents - always processes the inactive buffer
+ void processBuffer(unsigned char* buffer, int size) {
+	 buffer[size] = '\0';
+	uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+	*lights = !(*lights);
+
+	// For demonstration purposes, send a message indicating buffer processing
+	SerialOutputString("Processing inactive buffer...",&USART1_PORT);
+	// Now call parseCommand
+	parseCommand(buffer);
+ }
+```
+
+**Purpose:**  
+Custom user-defined callback to process a fully received buffer (inactive buffer after terminator character).
+
+**Input:**
+- `unsigned char *buffer` — Pointer to the buffer that contains received characters
+- `int size` — Number of bytes in the buffer
+
+**Output:**
+- *None (void function)*  
+  You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
 
 ### Part c)
 
@@ -246,18 +276,10 @@ Transmits a **null-terminated string** over USART1 using blocking (polling) tran
 
 ---
 
+Part b)
 #### `processBuffer()`
 
-**Purpose:**  
-Custom user-defined callback to process a fully received buffer (inactive buffer after terminator character).
 
-**Input:**
-- `unsigned char *buffer` — Pointer to the buffer that contains received characters
-- `int size` — Number of bytes in the buffer
-
-**Output:**
-- *None (void function)*  
-  You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
 
 
 #### Discussion Points
