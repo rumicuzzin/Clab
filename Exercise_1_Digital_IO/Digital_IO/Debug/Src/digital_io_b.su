@@ -1,5 +1,8 @@
 C:/Users/marcu/STM32Cube/Repository/STM32Cube_FW_F3_V1.11.5/Drivers/CMSIS/Core/Include/core_cm4.h:1688:22:__NVIC_EnableIRQ	16	static
 C:/Users/marcu/STM32Cube/Repository/STM32Cube_FW_F3_V1.11.5/Drivers/CMSIS/Core/Include/core_cm4.h:1816:22:__NVIC_SetPriority	16	static
-../Src/digital_io_b.c:19:6:DigitalIO_InitWithCallback	16	static,ignoring_inline_asm
-../Src/digital_io_b.c:55:6:DigitalIO_SetButtonCallback	16	static
-../Src/digital_io_b.c:62:6:DigitalIO_MoveLedForward	8	static
+../Src/digital_io_b.c:16:9:get_led_state	4	static
+../Src/digital_io_b.c:21:6:set_led_state	16	static
+../Src/digital_io_b.c:29:6:DigitalIO_Init	24	static,ignoring_inline_asm
+../Src/digital_io_b.c:77:6:DigitalIO_SetButtonCallback	16	static
+../Src/digital_io_b.c:84:6:next_led	8	static
+../Src/digital_io_b.c:102:6:EXTI0_IRQHandler	8	static
