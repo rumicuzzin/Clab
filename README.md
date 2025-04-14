@@ -426,9 +426,6 @@ Transmits a **null-terminated string** over USART1 using blocking (polling) tran
 - *None (void function)*  
   Sends each character over the TX register.
 
-
-#### Discussion Points
-
 ---
 
 ### Exercise 3: Timer Interface
