@@ -48,7 +48,7 @@ Key Features:
 
   
 ### Functions
-`DigitalIO_Init(ButtonCallback callback)` 
+#### `DigitalIO_Init(ButtonCallback callback)` 
 ```c
 oid DigitalIO_Init(ButtonCallback callback) {
     // Store the callback function
