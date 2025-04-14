@@ -56,6 +56,8 @@ Key Features:
 ### Part c)
 
 ### Part d) Advanced Functionality
+![Digital IO diagram](diagrams/DigitalIO.png)
+
 
 ### Discussion Points
 
