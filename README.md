@@ -382,7 +382,8 @@ The core functionality involves using a timer interrupt to trigger a function (s
 
 ### Functions:
 `enable_clocks()`
-**Purpose:** Enables the necessary peripheral clocks for GPIO ports and Timer 2.
+**Purpose:**
+Enables the necessary peripheral clocks for GPIO ports and Timer 2.
 **Inputs:** None
 **Outputs:** None
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
