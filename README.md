@@ -50,6 +50,7 @@ Key Features:
 - **Button Reading**: Detection of user button (PA0) state
 - **Hardware Abstraction**: Encapsulation of register access and bit manipulation
 
+
   
 ### Part b)
 
@@ -74,21 +75,83 @@ Uses polling to handle UART transmission and reception while monitoring for a te
 - **LED toggle**: When terminator character is received
 - Echo of **received buffer contents** after terminator detection
 ---
-#### `SerialOutputChar()`
+#### `USART1_SendChar()`
 
 ```c
-void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
-	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
-	}
-	serial_port->UART->TDR = data;
+// Function to send a single character
+void USART1_SendChar(unsigned char c)
+{
+    // Wait until the transmit data register is empty
+    while(!(USART1->ISR & USART_ISR_TXE_Msk));
+
+
+    // Write the character to the transmit data register
+    USART1->TDR = c;
+}
+```
+**Purpose:**
+Sends a single character over UART.
+
+**Input:**
+- c: Character to transmit
+
+**Output:**
+- Transmits the character via UART
+
+**Constraints:**
+- Blocking function that waits until the transmit data register is empty
+
+#### `USART1_SendString(const char* str)`
+
+```c
+// Function to send a string
+void USART1_SendString(const char* str)
+{
+    while(*str)
+    {
+        USART1_SendChar(*str++);
+    }
+
+
+    // Send carriage return and line feed for proper line ending in terminal
+    USART1_SendChar('\r');
+    USART1_SendChar('\n');
 }
 ```
 
+**Purpose:** Sends a null-terminated string over UART.
+
+**Input:**
+- str: Pointer to the null-terminated string to transmit
+
+**Output:**
+- Transmits each character in the string
+- Automatically adds carriage return ('\r') and line feed ('\n') at the end
+
+**Constraints:**
+- Calls the blocking USART1_SendChar function
 
 ---
 
-Other functions used:
-`enableUSART1()`, `enableLEDs()`
+#### `enableUSART1()`, 
+**Purpose:** Initializes and configures the USART1 peripheral and its GPIO pins
+
+**Input:**
+- None
+
+**Output:**
+- Configures GPIO Port C for UART alternate function
+- Sets up USART1 for 115200 baud rate with receive and transmit enabled
+
+**Configuration:**
+Uses predefined constants:
+- ALTFUNCTION: GPIO alternate function mode
+- RXTX: Alternate function register value
+- HIGHSPEED: GPIO speed configuration
+- BAUDRATE: Value for 115200 baud rate
+
+`enableLEDs()`
+- Configures the GPIO pins for LED control
 
 ### Part b)
 #### `processBuffer()`
@@ -108,7 +171,10 @@ void processBuffer(unsigned char* buffer, int size);
 	parseCommand(buffer);
  }
 ```
+**Purpose:** Callback
+- Process Asynchronous Communications
 
+- gets triggered when the UART reception system has collected a complete set of data
 
 ### Part c)
 
