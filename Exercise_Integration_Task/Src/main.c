@@ -118,7 +118,7 @@
      }
      else if (strcmp(command, "led") == 0)
      {
-         // parse the operand to decide which LED or pattern to set
+    	 SerialOutputString((uint8_t*)"LED if statement working.\r\n", &USART1_PORT);
      }
      else if (strcmp(command, "oneshot") == 0)
      {

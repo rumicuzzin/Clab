@@ -39,12 +39,17 @@ void (*rx_complete_callback)(unsigned char *incoming_buff, int incoming_counter)
 
 
 // Two buffers to store incoming characters
-unsigned char buffer1[BUFFER];
-unsigned char buffer2[BUFFER];
+volatile unsigned char buffer1[BUFFER];
+volatile unsigned char buffer2[BUFFER];
 
-// Variable for keeping track of content sizes
-int buffer1Size = 0;
-int buffer2Size = 0;
+// Variables for keeping track of RX buffer sizes
+volatile int buffer1Size = 0;
+volatile int buffer2Size = 0;
+
+// Variables for tracking
+volatile uint8_t *tx_buffer_ptr = 0x00;
+volatile uint32_t tx_buffer_len = 0;
+volatile uint32_t tx_index = 0;
 
 // User terminated character variable
 signed char ter_char;
@@ -59,6 +64,19 @@ void USART1_EXTI25_IRQHandler() {
 	if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk)) {
 		return;
 	}
+
+//	// TX handling snippet
+//	if (USART1->ISR & USART_ISR_TXE_Msk) {
+//	    if (tx_index < tx_buffer_len) {
+//	        USART1->TDR = tx_buffer_ptr[tx_index++];
+//	    } else {
+//	        // Transmission complete, disable TXE interrupt
+//	        //USART1->CR1 &= ~USART_CR1_TXEIE;
+//	        tx_buffer_ptr = 0x00;
+//	        tx_buffer_len = 0;
+//	    }
+//	}
+
 
 	// Checking if max storage capacity has been reached
 	if (activeBufferSize == BUFFER) {
@@ -79,8 +97,6 @@ void USART1_EXTI25_IRQHandler() {
 			// Toggle LEDs to indicate char received
 			// Note: probably not needed
 			if (data == ter_char) {
-
-
 
 				// Switch to the other buffer and process the now-inactive buffer
 				if (activeBufferNum == 1) {
@@ -105,7 +121,7 @@ void USART1_EXTI25_IRQHandler() {
 				// Reset the size for the new active buffer
 				// Note: need to be able to reset the buffer too
 				*activeBufferSize = 0;
-//				memset(activeBuffer, 0, BUFFER);
+				memset(activeBuffer, 0, BUFFER);
     	}
     }
 
@@ -187,10 +203,18 @@ void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
 	}
 }
 
+//void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
+//	tx_buffer_ptr = pt;
+//	tx_buffer_len = strlen((char*)pt);  // or pass length if non-null-terminated
+//	tx_index = 0;
+//}
+
 void USART1RX_enableInterrupts() {
 	__disable_irq();
 	// Generate an interrupt upon receiving data
 	USART1->CR1 |= USART_CR1_RXNEIE_Msk;
+	// Generate an interrupt upon transmitting data
+	USART1->CR1 |= USART_CR1_TXEIE_Msk;
 
 	// Set priority and enable interrupts
 	NVIC_SetPriority(USART1_IRQn, 1);
