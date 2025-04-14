@@ -69,11 +69,35 @@ Key Features:
 
 ### Part a) Basic Functionality
 Uses polling to handle UART transmission and reception while monitoring for a terminator character. 
-
 #### Features: 
 - **Periodic transmission**: Of a predefined string message
 - **LED toggle**: When terminator character is received
 - Echo of **received buffer contents** after terminator detection
+
+#### `SerialOutputString()`
+```c
+void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
+	uint32_t counter = 0;
+	while(*pt) {
+		SerialOutputChar(*pt, serial_port);
+		counter++;
+		pt++;
+	}
+	serial_port->completion_function(counter);
+}
+```
+**Purpose:**  
+Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
+
+**Input:**
+- `uint8_t *pt` — Pointer to the null-terminated string to be sent  
+- `SerialPort *serial_port` — Pointer to the USART config struct
+
+**Output:**
+- *None (void function)*  
+  Sends each character over the TX register.
+
+---
 
 Other functions used:
 `enableUSART1()`, `enableLEDs()`
@@ -246,32 +270,6 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 
 ![Double Buffer Diagram](diagrams/Serial-Buffer.png)
 
-
----
-
-#### `SerialOutputString()`
-```c
-void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
-	uint32_t counter = 0;
-	while(*pt) {
-		SerialOutputChar(*pt, serial_port);
-		counter++;
-		pt++;
-	}
-	serial_port->completion_function(counter);
-}
-```
-
-**Purpose:**  
-Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
-
-**Input:**
-- `uint8_t *pt` — Pointer to the null-terminated string to be sent  
-- `SerialPort *serial_port` — Pointer to the USART config struct
-
-**Output:**
-- *None (void function)*  
-  Sends each character over the TX register.
 
 ---
 
