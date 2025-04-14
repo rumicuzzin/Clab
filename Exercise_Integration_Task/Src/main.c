@@ -16,13 +16,11 @@
  ******************************************************************************
  */
 
- #include <int_serial.h>
-#include <stdint.h>
- #include "stm32f303xc.h"
+ #include "../Inc/common.h"
 
- #if !defined(__SOFT_FP__) && defined(__ARM_FP)
-   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
- #endif
+// #if !defined(__SOFT_FP__) && defined(__ARM_FP)
+//   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+// #endif
 
  #define ALTFUNCTION 0xA00
  #define RXTX 0x770000
@@ -34,9 +32,11 @@
  void processBuffer(unsigned char* buffer, int size);
  void parseCommand(unsigned char *inputBuffer);
 
+
+
  int main(void)
  {
-     uint8_t *string_to_send = "Sally is a beautiful dog!\r\n";
+     uint8_t *string_to_send = (uint8_t*)"Sally is a beautiful dog!\r\n";
      SerialInitialise(BAUD_115200, &USART1_PORT, '$',&processBuffer);
      USART1RX_enableInterrupts();
      enableLEDs();
@@ -49,6 +49,7 @@
      }
  }
 
+
  // Function to process buffer contents - always processes the inactive buffer
  void processBuffer(unsigned char* buffer, int size) {
 	 buffer[size] = '\0';
@@ -56,7 +57,7 @@
 	*lights = !(*lights);
 
 	// For demonstration purposes, send a message indicating buffer processing
-	SerialOutputString("Processing inactive buffer...",&USART1_PORT);
+	SerialOutputString((uint8_t*)"Processing inactive buffer...",&USART1_PORT);
 	// Now call parseCommand
 	parseCommand(buffer);
  }
@@ -71,7 +72,12 @@
  {
      // The buffer is presumably zero-terminated or we can forcibly zero-terminate.
      // If not, do something like:
-     // inputBuffer[size] = '\0';
+     //inputBuffer[size] = '\0';
+
+	// Everyime there is a new command we will disable any active timers
+	TIM2->DIER &= ~TIM_DIER_UIE;     // Disable update interrupt
+	NVIC_DisableIRQ(TIM2_IRQn);      // Disable NVIC interrupt
+	TIM2->CR1 &= ~TIM_CR1_CEN;       // Stop the timer
 
      // Find the first space
      char *spacePtr = strchr((char*)inputBuffer, ' ');
@@ -105,9 +111,15 @@
      // The command is the start of inputBuffer
      char *command = (char*)inputBuffer;
 
+     if (*command == '\n'){
+    	 command +=1;
+     }
      // The operand is right after the space
      char *operand = spacePtr + 1;  // might be an empty string if input ended with a space
-
+     // Variable to store binary of operand variable
+     uint32_t binary_value = 0;
+     uint32_t value = 0;
+     //SerialOutputString(command, &USART1_PORT);
      // Compare the command and act
      if (strcmp(command, "serial") == 0)
      {
@@ -116,16 +128,42 @@
          SerialOutputString((uint8_t*)operand, &USART1_PORT);
          SerialOutputString((uint8_t*)"\r\n", &USART1_PORT);
      }
+
      else if (strcmp(command, "led") == 0)
      {
          // parse the operand to decide which LED or pattern to set
+    	 while (*operand == '0' || *operand == '1') {
+    	     // Shift the current value left by 1 bit
+    	     binary_value <<= 1;
+
+    	     // Add the current bit (0 or 1)
+    	     if (*operand == '1') {
+    	         binary_value |= 1;
+    	     }
+
+    	     // Move to the next character
+    	     operand++;
+    	 }
+    	 update_leds(binary_value);
      }
+
      else if (strcmp(command, "oneshot") == 0)
      {
+    	 // Convert chat to value
+    	 value = (uint32_t)strtoul(operand, NULL, 10);
+
+    	 // Alll led's will light up after the specified delay time in ms
+    	 enable_clocks();
+    	 one_shot_trigger(value, &flash_led);
          // parse the operand to decide oneshot milliseconds
      }
      else if (strcmp(command, "timer") == 0)
      {
+    	enable_clocks();
+    	value = (uint32_t)strtoul(operand, NULL, 10);
+		set_x(value);
+		repeating_timer_init(value, &set_led);
+
          // parse the operand to decide timer milliseconds
      }
      else

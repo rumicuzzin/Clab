@@ -1,5 +1,4 @@
-#include <int_serial.h>
-#include "stm32f303xc.h"
+#include <common.h>
 
 // We store the pointers to the GPIO and USART that are used
 //  for a specific serial port. To add another serial port
@@ -105,7 +104,7 @@ void USART1_EXTI25_IRQHandler() {
 				// Reset the size for the new active buffer
 				// Note: need to be able to reset the buffer too
 				*activeBufferSize = 0;
-//				memset(activeBuffer, 0, BUFFER);
+ 				memset(activeBuffer, 0, BUFFER);
     	}
     }
 
