@@ -151,6 +151,17 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 ---
 
 #### `SerialOutputString()`
+```c
+void SerialOutputString(uint8_t *pt, SerialPort *serial_port) {
+	uint32_t counter = 0;
+	while(*pt) {
+		SerialOutputChar(*pt, serial_port);
+		counter++;
+		pt++;
+	}
+	serial_port->completion_function(counter);
+}
+'''
 
 **Purpose:**  
 Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
