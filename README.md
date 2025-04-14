@@ -17,7 +17,7 @@
 - [Team Members](#team-members)
 - [Exercise 1: Digital I/O](#exercise-1-digital-io)
   - [Part a) Basic Functionality](#part-a-basic-functionality)
-  - [Part b)](#part-b)
+  - [Part b)](#part-b) 
   - [Part c)](#part-c)
   - [Part d) Advanced Functionality](#part-d-advanced-functionality)
   - [Discussion Points](#discussion-points)
