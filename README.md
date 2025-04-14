@@ -11,6 +11,13 @@
 - **James Blisset** - Exercise 2: Serial
 - **Marcus** - Exercise 1: Digital I/O
 
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+
 
 Exercise 1: Digital I/O
 
