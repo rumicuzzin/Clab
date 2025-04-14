@@ -185,6 +185,7 @@ void processBuffer(unsigned char* buffer, int size);
 ### Part c)
 **Features:**
 - Interrupt-Driven Reception: UART reception using interrupts to avoid blocking
+---
 
 ##### `SerialInitialise()`
 **Purpose:** Initializes a serial port with specified baud rate and callback function.
@@ -200,6 +201,7 @@ void processBuffer(unsigned char* buffer, int size);
 - Only some baud rate configurations are implemented
 - Fixed at 8MHz clock assumption for baud rate calculation
 - No parity, stop bit, or word length configuration options
+---
 
 ##### `USART1RX_enableInterrupts()`
 **Purpose:** Enables interrupt-driven reception for USART1.
@@ -214,6 +216,23 @@ void processBuffer(unsigned char* buffer, int size);
 - Specific to USART1 only
 - Disables all interrupts briefly during configuration
 
+##### `USART1_EXTI25_IRQHandler()`
+**Purpose:** Interrupt handler for USART1 reception events
+**Input:**
+- None (called automatically by hardware on interrupt)
+
+**Output:**
+- Updates global buffer with received character
+- Toggles LED for visual feedback
+
+**Limitations:**
+- Uses global variables (string buffer and index)
+- Fixed buffer size (10 bytes)
+- Limited error handling (only checks for overrun and frame errors)
+- No terminator character detection
+- No callback or signal when buffer is full
+- No double buffering to prevent data loss during processing
+
 ---
 ### Part d) Advanced Functionality
 #### Features: 
@@ -221,6 +240,7 @@ void processBuffer(unsigned char* buffer, int size);
 - **LED Control**: GPIO interface for 8 LEDs (Port E)
 - **Command Framework**: Buffered input system with `processBuffer` callback
 - **Dual-buffer receive system**: With interrupt handling and buffer switching
+---
 
 
 #### `SerialInitialise()`
@@ -356,6 +376,8 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 **Output:**
 - *None (void function)*  
   Processes buffers and calls `rx_complete_callback()` internally.
+
+---
 
 **Double Buffer Functionality:**
 
