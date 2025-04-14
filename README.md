@@ -71,6 +71,15 @@
 ## Exercise 3: Timer Interface
 
 ### Part a) Basic Functionality
+Overview:
+This module demonstrates how to implement a **software timer system** on the STM32F3 Discovery board using **Timer 2** to generate periodic interrupts that invoke a user-defined **callback function**.
+
+The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
+
+Functions:
+`enable_clocks()`
+`initialise_board()`
+`timer_init(uint32_t time_period_ms, callback_t cb)`
 
 ### Part b)
 
