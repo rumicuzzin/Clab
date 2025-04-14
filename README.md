@@ -19,7 +19,6 @@
   - [Overview](#part-a-basic-functionality)
   - [Functions](#part-b) 
   - [Limitations](#part-c)
-  - [Discussion Points](#discussion-points)
 - [Exercise 2: Serial Interface](#exercise-2-serial-interface)
   - [Part a) Basic Functionality](#part-a-basic-functionality-1)
   - [Part b)](#part-b-1)
