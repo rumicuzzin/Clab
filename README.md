@@ -279,6 +279,8 @@ Functions:
 
 ### Part c) Advanced Functionality
 
+![Timers Diagram](diagrams/timers.drawio.png)
+
 ### Discussion Points
 
 ---
