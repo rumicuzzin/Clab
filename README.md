@@ -183,7 +183,36 @@ void processBuffer(unsigned char* buffer, int size);
 
 ---
 ### Part c)
+**Features:**
+- Interrupt-Driven Reception: UART reception using interrupts to avoid blocking
 
+##### `SerialInitialise()`
+**Purpose:** Initializes a serial port with specified baud rate and callback function.
+**Input:**
+- baudRate (uint32_t): Enumerated baud rate value (BAUD_9600, BAUD_19200, etc.)
+- serial_port (SerialPort*): Pointer to the serial port structure to initialize
+- completion_function (function pointer): Callback function invoked after string transmission
+
+**Output:**
+- Configured UART peripheral and associated GPIO pins
+
+**Limitations:**
+- Only some baud rate configurations are implemented
+- Fixed at 8MHz clock assumption for baud rate calculation
+- No parity, stop bit, or word length configuration options
+
+##### `USART1RX_enableInterrupts()`
+**Purpose:** Enables interrupt-driven reception for USART1.
+**Input:**
+- None
+
+**Output:**
+- Configured USART1 to generate interrupts on reception
+- Configured NVIC (Nested Vectored Interrupt Controller)
+
+**Limitations:**
+- Specific to USART1 only
+- Disables all interrupts briefly during configuration
 
 ---
 ### Part d) Advanced Functionality
