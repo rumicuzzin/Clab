@@ -412,18 +412,10 @@ This module demonstrates how to implement a **software timer system** on the STM
 The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
 
 ### Functions:
-<<<<<<< HEAD
 `enable_clocks()`  
 **Purpose:** Enables the necessary peripheral clocks for GPIO ports and Timer 2.
 **Inputs:** None  
 **Outputs:** None  
-=======
-`enable_clocks()`
-**Purpose:**
-Enables the necessary peripheral clocks for GPIO ports and Timer 2.  
-**Inputs:** None
-**Outputs:** None
->>>>>>> beeedf3229a20230b55905fab9fdacba36f760e1
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
 
 `initialise_board()`  
