@@ -134,8 +134,6 @@ void USART1_EXTI25_IRQHandler() {
     memset(activeBuffer, 0, BUFFER);
 }
 ```
-
-
 **Purpose:**  
 Interrupt Service Routine for USART1 — handles incoming characters, detects terminator, manages double-buffering, and triggers the parsing callback.
 
