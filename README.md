@@ -88,7 +88,53 @@ Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with
 ---
 
 #### `USART1_EXTI25_IRQHandler()`
-<pre> ```c void USART1_EXTI25_IRQHandler() { // Check for overrun or frame errors if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk)) { return; } // Store the read data in active buffer if there's space if (*activeBufferSize < BUFFER) { activeBuffer[*activeBufferSize] = data; (*activeBufferSize)++; } // Toggle LEDs to indicate char received // Note: probably not needed if (data == ter_char) { uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1; *lights = !(*lights); } // Switch to the other buffer and process the now-inactive buffer if (activeBufferNum == 1) { // Parse active buffer contents and size rx_complete_callback(buffer1, buffer1Size); // Switch active buffer to buffer2 activeBuffer = buffer2; activeBufferSize = &buffer2Size; activeBufferNum = 2; } else { // Process the buffer we're switching from rx_complete_callback(buffer2, buffer2Size); // Switch active buffer to buffer1 activeBuffer = buffer1; activeBufferSize = &buffer1Size; activeBufferNum = 1; } // Reset the size for the new active buffer // Note: need to be able to reset the buffer too *activeBufferSize = 0; memset(activeBuffer, 0, BUFFER); } ``` </pre>
+
+```c
+void USART1_EXTI25_IRQHandler() {
+    // Check for overrun or frame errors
+    if ((USART1->ISR & USART_ISR_FE_Msk) && (USART1->ISR & USART_ISR_ORE_Msk)) {
+        return;
+    }
+
+    // Store the read data in active buffer if there's space
+    if (*activeBufferSize < BUFFER) {
+        activeBuffer[*activeBufferSize] = data;
+        (*activeBufferSize)++;
+    }
+
+    // Toggle LEDs to indicate char received
+    // Note: probably not needed
+    if (data == ter_char) {
+        uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+        *lights = !(*lights);
+    }
+
+    // Switch to the other buffer and process the now-inactive buffer
+    if (activeBufferNum == 1) {
+        // Parse active buffer contents and size
+        rx_complete_callback(buffer1, buffer1Size);
+
+        // Switch active buffer to buffer2
+        activeBuffer = buffer2;
+        activeBufferSize = &buffer2Size;
+        activeBufferNum = 2;
+    } else {
+        // Process the buffer we're switching from
+        rx_complete_callback(buffer2, buffer2Size);
+
+        // Switch active buffer to buffer1
+        activeBuffer = buffer1;
+        activeBufferSize = &buffer1Size;
+        activeBufferNum = 1;
+    }
+
+    // Reset the size for the new active buffer
+    // Note: need to be able to reset the buffer too
+    *activeBufferSize = 0;
+    memset(activeBuffer, 0, BUFFER);
+}
+
+
 **Purpose:**  
 Interrupt Service Routine for USART1 — handles incoming characters, detects terminator, manages double-buffering, and triggers the parsing callback.
 
