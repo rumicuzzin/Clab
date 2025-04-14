@@ -712,6 +712,10 @@ void flash_led(void) {
 
 ## Exercise 4: Integration Task
 
+![parse function](diagrams/parseCommand.png)
+
+
+
 ### Discussion Points
 
 ---
