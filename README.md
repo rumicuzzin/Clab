@@ -88,7 +88,8 @@ Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with
 ---
 
 #### `USART1_EXTI25_IRQHandler()`
-
+<div style="max-height: 300px; overflow-y: auto;">
+<pre>
 ```c
 void USART1_EXTI25_IRQHandler() {
     // Check for overrun or frame errors
@@ -134,6 +135,8 @@ void USART1_EXTI25_IRQHandler() {
     memset(activeBuffer, 0, BUFFER);
 }
 ```
+</pre>
+</div>
 
 **Purpose:**  
 Interrupt Service Routine for USART1 — handles incoming characters, detects terminator, manages double-buffering, and triggers the parsing callback.
