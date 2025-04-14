@@ -69,22 +69,67 @@ Features:
 - **Command Framework**: Buffered input system with `processBuffer` callback
 - **Dual-buffer receive system**: With interrupt handling and buffer switching
 
-Functions: 
-- `SerialInitialise()`:  
-  Initializes **USART1**, sets the baud rate, configures GPIO pins for alternate functions, and enables interrupts. Also assigns a user-defined terminator character and a callback function to process received data.
+## 🔄 Function Inputs and Outputs
 
-- `USART1_EXTI25_IRQHandler()`:  
-  Interrupt handler that gets triggered on receiving data over USART1.  
-  It:
-  - Reads incoming characters into the active buffer.
-  - Checks for the termination character.
-  - Swaps to the alternate buffer.
-  - Calls the user-defined callback (`processBuffer`) to process the full buffer.
+### `SerialInitialise()`
 
-- `SerialOutputString()`:  
-  Sends a **null-terminated string** over USART1, one character at a time, using polling (waits for transmit buffer to be ready).
+**Purpose:**  
+Initializes USART1, GPIO pins, baud rate, and sets up RX interrupt handling with a terminator character.
 
-- 'processBuffer()': User-defined RX callback — processes the inactive buffer once full or terminated
+**Input:**
+- `uint32_t baudRate` — Desired baud rate (e.g., `BAUD_115200`)
+- `SerialPort *serial_port` — Pointer to the USART configuration struct (e.g., `&USART1_PORT`)
+- `char terminator` — Character to indicate end of message (e.g., `'$', '\n'`)
+- `void (*rx_parsing)(unsigned char*, int)` — Callback function for processing received data
+
+**Output:**
+- *None (void function)*  
+  Initializes peripherals and assigns internal state (side effects).
+
+---
+
+### `USART1_EXTI25_IRQHandler()`
+
+**Purpose:**  
+Interrupt Service Routine for USART1 — handles incoming characters, detects terminator, manages double-buffering, and triggers the parsing callback.
+
+**Input:**
+- *None (triggered by hardware interrupt)*
+
+**Output:**
+- *None (void function)*  
+  Processes buffers and calls `rx_complete_callback()` internally.
+
+---
+
+### `SerialOutputString()`
+
+**Purpose:**  
+Transmits a **null-terminated string** over USART1 using blocking (polling) transmission.
+
+**Input:**
+- `uint8_t *pt` — Pointer to the null-terminated string to be sent  
+- `SerialPort *serial_port` — Pointer to the USART config struct
+
+**Output:**
+- *None (void function)*  
+  Sends each character over the TX register.
+
+---
+
+### `processBuffer()`
+
+**Purpose:**  
+Custom user-defined callback to process a fully received buffer (inactive buffer after terminator character).
+
+**Input:**
+- `unsigned char *buffer` — Pointer to the buffer that contains received characters
+- `int size` — Number of bytes in the buffer
+
+**Output:**
+- *None (void function)*  
+  You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
+
 
 ### Discussion Points
 
