@@ -1,4 +1,0 @@
-../Src/digital_io_a.c:7:6:DigitalIO_Init	16	static
-../Src/digital_io_a.c:29:6:DigitalIO_SetLED	24	static
-../Src/digital_io_a.c:46:6:DigitalIO_SetLEDPattern	24	static
-../Src/digital_io_a.c:55:9:DigitalIO_ReadButton	4	static
