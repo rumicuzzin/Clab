@@ -99,6 +99,9 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 - *None (void function)*  
   Processes buffers and calls `rx_complete_callback()` internally.
 
+**Double Buffer Functionality:**
+
+
 ---
 
 #### `SerialOutputString()`
