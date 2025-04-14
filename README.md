@@ -17,9 +17,7 @@
 - [Exercise 4: Integration Task](#exercise-4-integration-task)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+
 
 ## Exercise 1: Digital I/O
 Details and explanation for Exercise 1, Digital I/O.
@@ -42,8 +40,3 @@ How to use the project after installation.
 ## Contributing
 How to contribute to the project.
 
-## License
-Information on the project's license.
-
-## Acknowledgements
-Credit to libraries, tools, or individuals that helped with the project.
