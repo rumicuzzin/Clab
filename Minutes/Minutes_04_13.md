@@ -1,8 +1,8 @@
 MEETING MINUTES WEEK 7
 
-DATE: Tuesday, 13/04/2025 
-
+DATE: Tuesday, 13/04/2025
 TIME: 5:30pm - 8pm
+LOCATION: PNR
 
 ATTENDEES: 
 - Marcus Kurishingal
@@ -15,14 +15,20 @@ APOLOGIES: None
 ABSENCES: None
 
 OLD BUSINESS: 
-- Integration ta
+- Continue integration of modules
+- Complete individual modules
 
 NEW BUSINESS:
-- complete integration tasks
-- write readme
+- Continue integration tasks
+- Write readme
+- Willem assist Marcus in Digital IO
+- James/Aubrey to finish uart before monday morning
 
 FURTHER ACTION POINTS:
-- 
+- All members to push changes by Monday morning
+- Contribute to readme sections
+- full integration to be completed by monday
+- prepare for tutor questions for lab
 
 MEETING MINTUES WRITTEN BY: Marcus Kurishingal 
 
