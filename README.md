@@ -185,10 +185,12 @@ void processBuffer(unsigned char* buffer, int size);
 ### Part c)
 **Features:**
 - Interrupt-Driven Reception: UART reception using interrupts to avoid blocking
----
+
+
 
 ##### `SerialInitialise()`
 **Purpose:** Initializes a serial port with specified baud rate and callback function.
+
 **Input:**
 - baudRate (uint32_t): Enumerated baud rate value (BAUD_9600, BAUD_19200, etc.)
 - serial_port (SerialPort*): Pointer to the serial port structure to initialize
@@ -205,6 +207,7 @@ void processBuffer(unsigned char* buffer, int size);
 
 ##### `USART1RX_enableInterrupts()`
 **Purpose:** Enables interrupt-driven reception for USART1.
+
 **Input:**
 - None
 
@@ -218,6 +221,7 @@ void processBuffer(unsigned char* buffer, int size);
 
 ##### `USART1_EXTI25_IRQHandler()`
 **Purpose:** Interrupt handler for USART1 reception events
+
 **Input:**
 - None (called automatically by hardware on interrupt)
 
