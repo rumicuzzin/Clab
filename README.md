@@ -50,6 +50,7 @@ Key Features:
 - **Button Reading**: Detection of user button (PA0) state
 - **Hardware Abstraction**: Encapsulation of register access and bit manipulation
 
+
   
 ### Part b)
 
@@ -74,15 +75,47 @@ Uses polling to handle UART transmission and reception while monitoring for a te
 - **LED toggle**: When terminator character is received
 - Echo of **received buffer contents** after terminator detection
 ---
-#### `SerialOutputChar()`
+#### `USART1_SendChar()`
 
 ```c
-void SerialOutputChar(uint8_t data, SerialPort *serial_port) {
-	while((serial_port->UART->ISR & USART_ISR_TXE) == 0){
-	}
-	serial_port->UART->TDR = data;
+// Function to send a single character
+void USART1_SendChar(unsigned char c)
+{
+    // Wait until the transmit data register is empty
+    while(!(USART1->ISR & USART_ISR_TXE_Msk));
+
+
+    // Write the character to the transmit data register
+    USART1->TDR = c;
 }
 ```
+**Purpose:**
+Sends a single character over UART.
+
+**Input:**
+c: Character to transmit
+
+**Output:**
+Transmits the character via UART
+
+**Constraints:**
+Blocking function that waits until the transmit data register is empty
+
+USART1_SendString(const char* str)
+Purpose: Sends a null-terminated string over UART.
+Input:
+
+str: Pointer to the null-terminated string to transmit
+
+Output:
+
+Transmits each character in the string
+Automatically adds carriage return ('\r') and line feed ('\n') at the end
+
+Constraints:
+
+Calls the blocking USART1_SendChar function
+
 
 
 ---
