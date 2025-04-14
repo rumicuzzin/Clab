@@ -138,7 +138,7 @@ void DigitalIO_SetLED(uint8_t ledNumber, uint8_t state) {
 **Testing:** Turn each LED on and off individually and verify visually  
 
 ---
-`DigitalIO_ReadButton_a()`
+#### `DigitalIO_ReadButton_a()`
 ```c
 uint8_t DigitalIO_ReadButton_a(void) {
     // Read button state from PA0
@@ -146,52 +146,68 @@ uint8_t DigitalIO_ReadButton_a(void) {
 }
 ```
 **Purpose:** Reads the current state of the user button  
+
 **Input:** None  
-**Output:**
-- 1 if button is pressed
-- 0 if button is not pressed  
-**Testing:** Press the button and verify the function returns 1, release and verify it returns 0  
+
+**Output:**  
+- `1` if button is pressed  
+- `0` if button is not pressed  
+
+**Testing:** Press the button and verify the function returns `1`. Release and verify it returns `0`.  
+
+---
 
 
-`DigitalIO_SetButtonCallback(ButtonCallback callback)`
+#### `DigitalIO_SetButtonCallback(ButtonCallback callback)`
 ```c
 void DigitalIO_SetButtonCallback(ButtonCallback callback) {
     buttonCallback = callback;
 }
 ```
-**Purpose:** Sets the callback function for button press events.
-**Input:** `callback`: New function pointer to be called when button is pressed   
+**Purpose:** Sets the callback function for button press events  
+
+**Input:** `callback`: Function pointer to be called when button is pressed  
+
 **Output:** None  
-**Testing:** Change callback to different functions and verify the new function is called on button press
 
+**Testing:** Change the callback to different functions and verify the correct one is triggered on button press  
 
-`get_led_state()`
+---
+#### `get_led_state()`
 ```c
 // Get function
 uint8_t get_led_state(){
 	return current_led;
 }
 ```
-**Purpose:**  Gets the current LED state (which LED is active).  
+**Purpose:** Gets the current LED state (i.e. which LED is active)  
+
 **Input:** None  
-**Output:** Current active LED number (0-7)  
-**Testing:** Verify that the returned value matches the current LED
 
+**Output:** Current active LED number (0–7)  
 
-`set_led_state(uint8_t new_val)`
+**Testing:** Verify that the returned value matches the currently active LED  
+
+---
+#### `set_led_state(uint8_t new_val)`
 ```c
 // Set function
 void set_led_state(uint8_t new_val){
 	current_led = new_val;
 }
 ```
-**Purpose:** Sets the current LED state (which LED should be active).  
-**Input:** `new_val`: New LED number (0-7)  
+**Purpose:** Sets the current LED state (i.e. which LED should be active)  
+
+**Input:** `new_val`: New LED number (0–7)  
+
 **Output:** None  
-**Testing:** Verify that changing the LED state actually updates the internal state variable.
+
+**Testing:** Verify that changing the LED state updates the internal state variable  
+
+---
 
 
-`next_led()`
+#### `next_led()`
 ```c
 // Callback function - moves to next LED
 void next_led(void) {
@@ -206,14 +222,19 @@ void next_led(void) {
     DigitalIO_SetLED(get_led_state(), 1);
 }
 ```
-**Purpose:** Callback function that moves to the next LED in sequence.  
+*Purpose:** Callback function that moves to the next LED in sequence  
+
 **Input:** None  
+
 **Output:** None  
-**Testing:** Verify that calling this function cycles to the next LED.
+
+**Testing:** Verify that calling this function cycles to the next LED  
+
+---
 
 
 
-`new_callback_function()`
+#### `new_callback_function()`
 ```c
 void new_callback_function(void){
 // If there is no delay, act as normal
@@ -224,14 +245,17 @@ void new_callback_function(void){
 }
 
 ```
-**Purpose:** Button press callback that sets the LED move state to pending instead of immediately moving the LED  
+**Purpose:** Button press callback that sets the LED move state to pending (does not immediately change the LED)  
+
 **Input:** None  
+
 **Output:** None  
-**Testing:** Verify that button presses update the LED state to pending without immediately changing LEDs
 
+**Testing:** Verify that button presses set the state to pending without immediately changing LEDs  
 
+---
 
-`initialise_delay()`
+#### `initialise_delay()`
 ```c
 // Timer initialization
 void initialise_delay(void) {
@@ -249,12 +273,17 @@ void initialise_delay(void) {
     NVIC_EnableIRQ(TIM2_IRQn);
 }
 ```
-**Purpose:** Initialises the timer for delayed LED response.  
-**Input:** None 
-**Output:** None  
-**Testing:** Verify that the timer is properly initialized and interrupts are generated.
+**Purpose:** Initialises the timer for delayed LED response  
 
-`set_delay(int enable)`
+**Input:** None  
+
+**Output:** None  
+
+**Testing:** Verify that the timer is initialised and generates interrupts  
+
+---
+
+#### `set_delay(int enable)`
 ```c
 // Function to enable or disable delay mode
 void set_delay(int enable) {
@@ -266,11 +295,14 @@ void set_delay(int enable) {
     }
 }
 ```
-**Purpose:** Enables or disables the delay mode.  
-**Input:** `enable`: 1 to enable delay, 0 to disable 
-**Output:** None  
-**Testing:** Verify that enabling/disabling delay mode changes the behavior of button responses..
+*Purpose:** Enables or disables delay mode  
 
+**Input:** `enable`: `1` to enable delay, `0` to disable  
+
+**Output:** None  
+
+**Testing:** Verify that enabling/disabling delay changes the behaviour of button responses  
+---
 
 ### Limitations
 - Concurrency Issues
