@@ -375,69 +375,69 @@ This module demonstrates how to implement a **software timer system** on the STM
 The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
 
 ### Functions:
-`enable_clocks()`
+`enable_clocks()`  
 **Purpose:** Enables the necessary peripheral clocks for GPIO ports and Timer 2.
-**Inputs:** None
-**Outputs:** None
+**Inputs:** None  
+**Outputs:** None  
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
 
-`initialise_board()`
-**Purpose:** Initializes the board I/O, configuring PE8-PE15 as outputs for the LEDs.
-**Inputs:** None
-**Outputs:** None
-**Testing:** After calling this function, check that GPIOE->MODER has the correct configuration for pins 8-15.
+`initialise_board()`  
+**Purpose:** Initializes the board I/O, configuring PE8-PE15 as outputs for the LEDs.  
+**Inputs:** None  
+**Outputs:** None  
+**Testing:** After calling this function, check that GPIOE->MODER has the correct configuration for pins 8-15.  
 
-`timer_init(uint32_t time_period_ms, callback_t cb)`
-**Purpose:** Initializes Timer 2 with a specified time period and registers a callback function to be executed when the timer period elapses.
+`timer_init(uint32_t time_period_ms, callback_t cb)`  
+**Purpose:** Initializes Timer 2 with a specified time period and registers a callback function to be executed when the timer period elapses.  
 **Inputs:**
 - time_period_ms: The timer period in milliseconds
 - cb: Function pointer to the callback function
 
-**Outputs:** None
+**Outputs:** None  
 **Testing:**
 - Initialize with a known time period and verify that TIM2->ARR is set to (time_period_ms - 1)
 - Initialize with a test callback and trigger the timer to verify the callback is executed
 - Check that TIM2->DIER has the UIE bit set for update interrupts
 
-'set_led()'
+`set_led()`  
 **Purpose:** Handles LED sequencing, turning on LEDs in sequence from PE8 to PE15, and resets the sequence after all LEDs are lit.
-**Inputs**: None
-**Outputs**: None
+**Inputs**: None  
+**Outputs**: None  
 **Testing**:
 - Call the function 8 times and visually verify that each LED turns on in sequence
 - Call the function a 9th time and verify all LEDs turn off (sequence resets)
 
-'enable_timer()'
-**Purpose:** Enables the Timer 2 counter to start the timer operation.
-**Inputs:** None
-**Outputs:** None
-**Testing:** After calling this function, verify that TIM2->CR1 has the CEN bit set.
+`enable_timer()`  
+**Purpose:**Enables the Timer 2 counter to start the timer operation.
+**Inputs:** None  
+**Outputs:** None  
+**Testing:** After calling this function, verify that TIM2->CR1 has the CEN bit set.  
 
-'set_new_period(uint32_t new_value)'
-**Purpose:** Resets the timer with a new period by stopping the timer, updating the period, and restarting it.
+`set_new_period(uint32_t new_value)`  
+**Purpose:** Resets the timer with a new period by stopping the timer, updating the period, and restarting it.  
 **Inputs:**
 - new_value: The new timer period value
-**Outputs:** None
+**Outputs:** None  
 **Testing:**
 - Call this function with a new period and verify TIM2->ARR is updated
 - Verify the timer stops and restarts by checking TIM2->CR1 CEN bit during execution
 - Verify TIM2->CNT is reset to 0
 
-'GPIO_Button_Init()'
-**Purpose:** Initializes the User Button (PA0) with interrupt capability for rising edge detection.
-**Inputs:** None
-**Outputs:** None
+`GPIO_Button_Init()`  
+**Purpose:** Initializes the User Button (PA0) with interrupt capability for rising edge detection.  
+**Inputs:** None  
+**Outputs:** None  
 **Testing:**
 - After calling this function, verify GPIOA->MODER has pin 0 configured as input
 - Verify SYSCFG->EXTICR[0] has PA0 configured as interrupt source
 - Press the button and verify the button_pressed flag is set in the interrupt handler
 
-'one_shot_trigger(uint32_t delay, callback_t cb)'
-**Purpose:** Configures Timer 2 for one-shot operation, triggering the provided callback function once after the specified delay.
+`one_shot_trigger(uint32_t delay, callback_t cb)`  
+**Purpose:** Configures Timer 2 for one-shot operation, triggering the provided callback function once after the specified delay.  
 **Inputs:**
 - delay: The delay in milliseconds before the callback function is executed
 - cb: Function pointer to the callback function
-**Outputs:** None
+**Outputs:** None  
 **Testing:**
 - Set up a test callback and trigger a one-shot timer with a known delay
 - Verify the callback is executed after the expected delay
@@ -445,11 +445,11 @@ The core functionality involves using a timer interrupt to trigger a function (s
 - Verify TIM2->CR1 has the OPM bit set for one-pulse mode
 
 
-'flash_led()'
-**Purpose:** Turns off all LEDs and then flashes LED1 (PE9).
-**Inputs:** None
-**Outputs:** None
-**Testing:** Call the function and visually verify all LEDs turn off and LED1 (PE9) turns on.
+`flash_led()`  
+**Purpose:** Turns off all LEDs and then flashes LED1 (PE9).  
+**Inputs:** None  
+**Outputs:** None  
+**Testing:** Call the function and visually verify all LEDs turn off and LED1 (PE9) turns on.  
 
 
 
