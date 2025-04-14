@@ -1,16 +1,8 @@
 # Clab MTRX2700 C Lab for STM32F3 Discovery Board
 
-## Project Overview
-
----
-
-## Team Members
-- **Will Rumi** - Exercise 3: Timers  
-- **Audrey** - Exercise 2: Serial  
-- **James Blisset** - Exercise 2: Serial  
-- **Marcus** - Exercise 1: Digital I/O  
-
 ## Table of Contents
+- [Project Overview](#project-overview)
+- [Team Members](#team-members)
 - [Exercise 1: Digital I/O](#exercise-1-digital-io)
   - [Part a) Basic Functionality](#part-a-basic-functionality)
   - [Part b)](#part-b)
@@ -33,6 +25,17 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
+
+---
+## Project Overview
+
+---
+
+## Team Members
+- **Will Rumi** - Exercise 3: Timers  
+- **Audrey** - Exercise 2: Serial  
+- **James Blisset** - Exercise 2: Serial  
+- **Marcus** - Exercise 1: Digital I/O
 
 ---
 
