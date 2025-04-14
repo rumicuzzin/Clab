@@ -688,7 +688,7 @@ This module demonstrates how to implement a **software timer system** on the STM
 The core functionality involves using a timer interrupt to trigger a function (such as toggling LEDs) at a configurable time interval. It showcases function pointers, NVIC interrupt configuration, and low-level peripheral access on STM32.
 
 ### Functions:
-`enable_clocks()`
+#### `enable_clocks()`
 ```c
 void enable_clocks() {
     // Enable the clock for the GPIO port of the LED
@@ -702,7 +702,8 @@ void enable_clocks() {
 **Outputs:** None  
 **Testing:** After calling this function, verify that the RCC->AHBENR and RCC->APB1ENR registers contain the appropriate bit flags for GPIO and Timer 2 clocks.
 
-`initialise_board()`  
+---
+### `initialise_board()`  
 ```c
 void initialise_board() {
     // Get a pointer to the second half word of the MODER register (for outputs pe8-15)
@@ -716,7 +717,8 @@ void initialise_board() {
 **Outputs:** None  
 **Testing:** After calling this function, check that GPIOE->MODER has the correct configuration for pins 8-15.  
 
-`timer_init(uint32_t time_period_ms, callback_t cb)`  
+---
+### `timer_init(uint32_t time_period_ms, callback_t cb)`  
 ```c
 void timer_init(uint32_t time_period_ms, callback_t cb) {
 	// Disable the interrupts while messing around with the settings
@@ -774,7 +776,8 @@ void timer_init(uint32_t time_period_ms, callback_t cb) {
 - Initialize with a test callback and trigger the timer to verify the callback is executed
 - Check that TIM2->DIER has the UIE bit set for update interrupts
 
-`set_led()`  
+---
+### `set_led()`  
 ```c
 void set_led(void) {
     // When we've reached LED 8, it means all LEDs are lit, so reset and turn all off
@@ -803,7 +806,8 @@ void set_led(void) {
 - Call the function 8 times and visually verify that each LED turns on in sequence
 - Call the function a 9th time and verify all LEDs turn off (sequence resets)
 
-`enable_timer()`  
+---
+### `enable_timer()`  
 ```c
 void enable_timer(void) {
     // Enable the Timer 2 counter
@@ -815,7 +819,8 @@ void enable_timer(void) {
 **Outputs:** None  
 **Testing:** After calling this function, verify that TIM2->CR1 has the CEN bit set.  
 
-`set_new_period(uint32_t new_value)`  
+---
+### `set_new_period(uint32_t new_value)`  
 ```c
 void set_new_period(uint32_t new_value){
 
@@ -841,7 +846,8 @@ void set_new_period(uint32_t new_value){
 - Verify the timer stops and restarts by checking TIM2->CR1 CEN bit during execution
 - Verify TIM2->CNT is reset to 0
 
-`GPIO_Button_Init()`  
+---
+### `GPIO_Button_Init()`  
 ```c
 void GPIO_Button_Init(void)
 {
@@ -876,7 +882,8 @@ void GPIO_Button_Init(void)
 - Verify SYSCFG->EXTICR[0] has PA0 configured as interrupt source
 - Press the button and verify the button_pressed flag is set in the interrupt handler
 
-`one_shot_trigger(uint32_t delay, callback_t cb)`  
+---
+### `one_shot_trigger(uint32_t delay, callback_t cb)`  
 ```c
 void one_shot_trigger(uint32_t  delay_ms, callback_t cb_c) {
     // Store the callback function for later use
@@ -936,8 +943,8 @@ void one_shot_trigger(uint32_t  delay_ms, callback_t cb_c) {
 - Verify Timer 2 stops after the callback (one-pulse mode)
 - Verify TIM2->CR1 has the OPM bit set for one-pulse mode
 
-
-`flash_led()`  
+---
+### `flash_led()`  
 ```c
 void flash_led(void) {
 
@@ -955,7 +962,7 @@ void flash_led(void) {
 **Outputs:** None  
 **Testing:** Call the function and visually verify all LEDs turn off and LED1 (PE9) turns on.  
 
-
+---
 
 ![Timers Diagram](diagrams/timers.drawio.png)
 
