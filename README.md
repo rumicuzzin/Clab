@@ -406,6 +406,23 @@ Uses predefined constants:
 `enableLEDs()`
 - Configures the GPIO pins for LED control
 ---
+#### Handling data in the buffer
+- Data handling: It completely abandons all previously received data when the buffer fills up. The user's partial input is discarded, not preserved.
+- User notification: It informs the user that their input was too large by sending a clear error message with the specific buffer size.
+- Recovery: It puts the system back into a state where it can receive new input by resetting the index.
+
+```c
+// If we have stored the maximum amount, reset buffer
+        if (i >= BUFFER)
+        {
+            i = 0;
+            char buffer_msg[50];
+            sprintf(buffer_msg, "Input string is too large. Buffer size is %d", BUFFER);
+            USART1_SendString(buffer_msg);
+        }
+```
+
+
 ### Part b)
 #### `processBuffer()`
 
