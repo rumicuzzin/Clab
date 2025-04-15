@@ -695,6 +695,18 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 
 
 ---
+**Interaction: Software Modules vs Received Data**
+Receiving Data - 
+- Callback function is set when initialising the module - `SerialInitialise()` is passed `rx_parsing` as a parameter
+- `rx_complete_callback`: Global variable that stores the function pointer
+Requesting latest Data -
+- Double-buffering System: two separate buffers (`buffer1` and `buffer2`) are used alternately
+- The system proactively delivers the data to the modules via the callback function
+Buffer Management: Ping-pong buffer approach -
+- `buffer1` is active and receives the terminating character --> Invokes the callback with buffer1 and its contents --> Switches to buffer2 for new incoming data --> Resets buffer1's size counter to 0 and clears its contents with `memset()`
+- The same process happens in reverse when buffer2 is active
+
+---
 
 #### `processBuffer()`
 **Purpose:**  
