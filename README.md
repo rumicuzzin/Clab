@@ -421,7 +421,7 @@ Uses predefined constants:
             USART1_SendString(buffer_msg);
         }
 ```
-
+---
 
 ### Part b)
 #### `processBuffer()`
@@ -489,6 +489,7 @@ void processBuffer(unsigned char* buffer, int size);
 - Specific to USART1 only
 - Disables all interrupts briefly during configuration
 
+---
 ##### `USART1_EXTI25_IRQHandler()`
 **Purpose:** Interrupt handler for USART1 reception events
 
