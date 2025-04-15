@@ -423,7 +423,8 @@ Uses predefined constants:
 ```
 ---
 #### Terminating Character
-- Used the **"delimiter-based framing"** method: A special character marks the end of a complete message or packet of data.
+
+Used the **"delimiter-based framing"** method: A special character marks the end of a complete message or packet of data.
 When the TERMINATOR character is received:
 - The LEDs are toggled (to provide visual confirmation)
 - The current buffer contents are printed
