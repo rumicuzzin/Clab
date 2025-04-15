@@ -708,8 +708,8 @@ Requesting latest Data -
 
 Buffer Management: Ping-pong buffer approach -
 
-- `buffer1` is active and receives the terminating character --> Invokes the callback with buffer1 and its contents --> Switches to buffer2 for new incoming data --> Resets buffer1's size counter to 0 and clears its contents with `memset()`
-- The same process happens in reverse when buffer2 is active
+- `buffer1` is active and receives the terminating character --> Invokes the callback with `buffer1` and its contents --> Switches to `buffer2` for new incoming data --> Resets `buffer1` size counter to 0 and clears its contents with `memset()`
+- The same process happens in reverse when `buffer2` is active
 
 ---
 
