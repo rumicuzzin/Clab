@@ -724,7 +724,7 @@ Custom user-defined callback (part b) to process a fully received buffer (inacti
 **Output:**
 - *None (void function)*  
   You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
-
+---
 
 #### `SerialOutputString()`
 ```c
