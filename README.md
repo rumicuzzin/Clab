@@ -1052,22 +1052,155 @@ void flash_led(void) {
 
 ![parse function](diagrams/parseCommand.png)
 
+# MTRX2700 Mechatronics 2 - C Lab Integration Task
 
+### Features
+- Modular design with well-defined interfaces between components
+- Interrupt-driven serial communication using a double buffer system
+- Timer-based callbacks for periodic and one-shot events
+- LED control with configurable patterns
+- Command parsing system for handling different operation types
 
-### Discussion Points
+## Code Structure
+```
+project/
+├── Inc/
+│   ├── common.h         # Common definitions and type declarations
+│   ├── digital_io.h     # Header for Digital I/O module
+│   ├── int_serial.h     # Header for Interrupt-based Serial module
+│   └── timers.h         # Header for Timer Interface module
+├── Src/
+│   ├── digital_io.c     # Implementation of Digital I/O module
+│   ├── int_serial.c     # Implementation of Serial Interface module
+│   ├── timers.c         # Implementation of Timer Interface module
+│   └── main.c           # Main program and integration of modules
+└── README.md            # This file
+```
 
----
+## Module Descriptions
 
-## Installation
-Instructions for setting up the project locally.
+### 1. Digital I/O Module
+The Digital I/O module encapsulates functionality for controlling the LEDs and button on the STM32F3 Discovery board.
 
----
+#### Features:
+- LED state encapsulation with getter/setter methods
+- LED pattern control
+- Button callback functionality
+- Functions to update LEDs based on binary patterns
 
-## Usage
-How to use the project after installation.
+#### Key Functions:
+- `get_led_state()` - Returns the current LED state
+- `set_led_state()` - Sets a new LED state
+- `update_leds()` - Updates LED pattern based on a binary value
+- `flash_led()` - Turns on all LEDs (used for one-shot timer demonstration)
+- `set_led()` - Sequentially turns on LEDs (used for repeating timer)
 
----
+### 2. Serial Interface Module
+The Serial Interface module provides UART communication with interrupt-driven reception using a double buffer system.
 
-## Contributing
-How to contribute to the project.
+#### Features:
+- Interrupt-based character reception
+- Double buffer system for continuous reception
+- Callback function on message completion
+- Configurable terminating character
 
+#### Key Functions:
+- `SerialInitialise()` - Initializes the UART with specified baud rate and terminator
+- `SerialOutputChar()` - Outputs a single character
+- `SerialOutputString()` - Outputs a string of characters
+- `USART1RX_enableInterrupts()` - Enables interrupt-driven reception
+
+### 3. Timer Interface Module
+The Timer Interface module provides timer functionality for both repeating and one-shot callbacks.
+
+#### Features:
+- Configurable time intervals
+- Callback function registration
+- Support for repeating and one-shot timer modes
+- Period adjustment via getter/setter functions
+
+#### Key Functions:
+- `repeating_timer_init()` - Initializes a repeating timer with callback
+- `one_shot_trigger()` - Sets up a one-shot timer event
+- `set_new_period()` - Changes the timer period
+- `get_x()` / `set_x()` - Getter/setter for timer period
+
+### 4. Integration (Main)
+The main program integrates all modules to create a complete system that processes commands received over serial.
+
+#### Command Format
+Commands follow the format: `command operand` where:
+- `command` is one of: `led`, `serial`, `oneshot`, or `timer`
+- `operand` depends on the command type
+
+#### Supported Commands:
+1. **LED Control**: `led 10001010`
+   - Sets LEDs to the specified binary pattern (1=ON, 0=OFF)
+
+2. **Serial Echo**: `serial This is a test message`
+   - Echoes back the operand string through the serial port
+
+3. **One-shot Timer**: `oneshot 1000`
+   - Triggers a one-shot timer event after the specified milliseconds
+   - When triggered, all LEDs will light up once
+
+4. **Repeating Timer**: `timer 1000`
+   - Sets up a repeating timer with the specified period in milliseconds
+   - Each trigger will light up LEDs sequentially
+
+## Usage Instructions
+
+### Setting Up the Hardware
+1. Connect the STM32F3 Discovery board to your computer via USB
+2. Connect a serial adapter to the UART pins:
+   - RX (PC10)
+   - TX (PC11)
+   - GND
+
+### Running the Program
+1. Flash the compiled program to the STM32F3 Discovery board
+2. Open a serial terminal program (e.g., PuTTY, TeraTerm, or minicom)
+3. Configure the serial connection:
+   - Baud rate: 115200
+   - Data bits: 8
+   - Stop bits: 1
+   - Parity: None
+   - Flow control: None
+4. Send commands using the format described above
+
+### Example Commands
+- `led 10101010` - Set alternating LED pattern
+- `serial Hello, STM32!` - The board will echo back "Hello, STM32!"
+- `oneshot 2000` - All LEDs will light up after a 2-second delay
+- `timer 500` - LEDs will light up sequentially with 500ms interval
+
+## Testing Procedures
+Each module was tested individually before integration:
+
+### Digital I/O Testing
+- Verified LED control functions by setting various patterns
+- Tested get/set functions for LED state encapsulation
+- Confirmed button callback functionality
+
+### Serial Interface Testing
+- Tested character transmission and reception
+- Verified buffer switching on terminator character
+- Tested callback triggering with various message lengths
+- Confirmed handling of buffer overflow conditions
+
+### Timer Interface Testing
+- Verified timer initialization with different periods
+- Tested callback functionality for both repeating and one-shot modes
+- Confirmed period changing via getter/setter functions
+
+### Integration Testing
+- Tested all command types with various operands
+- Verified concurrent operation of timers and serial communication
+- Tested error handling for malformed commands
+- Confirmed system stability under continuous operation
+
+## Limitations and Future Improvements
+- Button callback functionality is implemented but not used in the final integration
+- Serial transmission is blocking; could be improved with interrupt-based transmission
+- Currently using only one timer (TIM2); could be extended to use multiple timers
+- Command parser could be enhanced with more robust error handling
