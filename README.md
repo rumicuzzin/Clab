@@ -422,6 +422,40 @@ Uses predefined constants:
         }
 ```
 ---
+#### Terminating Character
+- Used the **"delimiter-based framing"** method: A special character marks the end of a complete message or packet of data.
+When the TERMINATOR character is received:
+- The LEDs are toggled (to provide visual confirmation)
+- The current buffer contents are printed
+- The buffer index is reset to 0 (to prepare for the next incoming message)
+- A confirmation message is sent
+  
+```c
+// Check if the received character is the terminator '#'
+if (data == TERMINATOR)
+{
+    // Toggle LEDs
+    uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+    *lights = !(*lights);
+
+    // Print buffer contents
+    USART1_SendString("Buffer contents:");
+    for(int j = 0; j < i; j++) {
+        USART1_SendChar(string[j]);
+    }
+    USART1_SendChar('\r');
+    USART1_SendChar('\n');
+
+    // Reset buffer index
+    i = 0;
+
+    // Confirm # detected and LED toggle by sending a message
+    USART1_SendString("# Character detected!");
+}
+```
+
+---
+
 
 ### Part b)
 #### `processBuffer()`
