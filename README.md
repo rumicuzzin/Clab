@@ -406,6 +406,58 @@ Uses predefined constants:
 `enableLEDs()`
 - Configures the GPIO pins for LED control
 ---
+#### Handling data in the buffer
+- Data handling: It completely abandons all previously received data when the buffer fills up. The user's partial input is discarded, not preserved.
+- User notification: It informs the user that their input was too large by sending a clear error message with the specific buffer size.
+- Recovery: It puts the system back into a state where it can receive new input by resetting the index.
+
+```c
+// If we have stored the maximum amount, reset buffer
+        if (i >= BUFFER)
+        {
+            i = 0;
+            char buffer_msg[50];
+            sprintf(buffer_msg, "Input string is too large. Buffer size is %d", BUFFER);
+            USART1_SendString(buffer_msg);
+        }
+```
+---
+#### Terminating Character
+
+Used the **"delimiter-based framing"** method: A special character marks the end of a complete message or packet of data.
+When the TERMINATOR character is received:
+- The LEDs are toggled (to provide visual confirmation)
+- The current buffer contents are printed
+- The buffer index is reset to 0 (to prepare for the next incoming message)
+- A confirmation message is sent
+  
+```c
+// Check if the received character is the terminator '#'
+if (data == TERMINATOR)
+{
+    // Toggle LEDs
+    uint8_t* lights = ((uint8_t*)&(GPIOE->ODR)) + 1;
+    *lights = !(*lights);
+
+    // Print buffer contents
+    USART1_SendString("Buffer contents:");
+    for(int j = 0; j < i; j++) {
+        USART1_SendChar(string[j]);
+    }
+    USART1_SendChar('\r');
+    USART1_SendChar('\n');
+
+    // Reset buffer index
+    i = 0;
+
+    // Confirm # detected and LED toggle by sending a message
+    USART1_SendString("# Character detected!");
+}
+```
+
+---
+
+
 ### Part b)
 #### `processBuffer()`
 
@@ -472,6 +524,7 @@ void processBuffer(unsigned char* buffer, int size);
 - Specific to USART1 only
 - Disables all interrupts briefly during configuration
 
+---
 ##### `USART1_EXTI25_IRQHandler()`
 **Purpose:** Interrupt handler for USART1 reception events
 
@@ -642,6 +695,23 @@ Interrupt Service Routine for USART1 — handles incoming characters, detects te
 
 
 ---
+**Interaction: Software Modules vs Received Data**
+Receiving Data - 
+
+- Callback function is set when initialising the module - `SerialInitialise()` is passed `rx_parsing` as a parameter
+- `rx_complete_callback`: Global variable that stores the function pointer
+
+Requesting latest Data -
+
+- Double-buffering System: two separate buffers (`buffer1` and `buffer2`) are used alternately
+- The system proactively delivers the data to the modules via the callback function
+
+Buffer Management: Ping-pong buffer approach -
+
+- `buffer1` is active and receives the terminating character --> Invokes the callback with `buffer1` and its contents --> Switches to `buffer2` for new incoming data --> Resets `buffer1` size counter to 0 and clears its contents with `memset()`
+- The same process happens in reverse when `buffer2` is active
+
+---
 
 #### `processBuffer()`
 **Purpose:**  
@@ -654,7 +724,7 @@ Custom user-defined callback (part b) to process a fully received buffer (inacti
 **Output:**
 - *None (void function)*  
   You define what to do with the data — e.g., parsing commands, logging, forwarding, etc.
-
+---
 
 #### `SerialOutputString()`
 ```c
